@@ -69,7 +69,8 @@ export const generateRefreshToken = (userId: Number, response: Response): Promis
         maxAge: 259200000,
         httpOnly: true,
         secure: false,
-        sameSite: 'strict'
+        sameSite: 'strict',
+        path: '/'
       });
       resolve(token);
     })
@@ -84,7 +85,7 @@ export const verifyRefreshToken = (token: string): Promise<any | HttpError> => {
   return new Promise ((resolve, reject) => {
     JWT.verify(token, JWT_REFRESH_SECRET, (err, payload: any) => {
       if (err) reject(new createHttpError.BadRequest());
-      resolve(payload?.id)
-    })
+      resolve(payload);
+    });
   });
 }
