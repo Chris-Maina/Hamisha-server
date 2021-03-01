@@ -1,14 +1,13 @@
+import dotenv from 'dotenv';
+// load env variables
+dotenv.config();
 import cors from 'cors';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { Model } from 'objection';
 import createError from 'http-errors';
 import express, { Request, Response, NextFunction } from 'express';
 
 import routes from './controlers';
-
-// load env variables
-dotenv.config();
 import knex from './knex';
 
 // Bind all Models to a knex instance.
