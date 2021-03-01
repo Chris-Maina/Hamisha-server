@@ -4,7 +4,13 @@ import { Response, Router, Request, NextFunction } from 'express';
 import { USER_TYPES } from '../common/constants';
 import { User, Mover, Customer } from '../models';
 import { registerSchema, loginSchema } from '../schemas';
-import { generateRefreshToken, generateToken, verifyRefreshToken } from '../helpers/jwt_helpers';
+import { RequestWithPayload } from '../common/interfaces';
+import {
+  verifyToken,
+  generateToken,
+  verifyRefreshToken,
+  generateRefreshToken,
+} from '../helpers/jwt_helpers';
 
 const router = Router();
 
@@ -64,7 +70,11 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
 
     const user = await User
       .query()
-      .findOne({ email });
+      .findOne({ email })
+      .withGraphFetched({
+        customer: true,
+        mover: true
+      });
     
     if (!user) throw new createHttpError.NotFound(`User is not registered`);
 
@@ -75,11 +85,14 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
     await generateRefreshToken(user.id, res);
 
     res.status(200);
+
     return res.send({
       id: user.id,
       email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
+      customer: user.customer,
+      mover: user.mover,
       access_token: token,
     });
   } catch (error) {
@@ -94,11 +107,12 @@ router.get('/refresh-token', async (req: Request, res: Response, next: NextFunct
     if (!cookieArr) throw new createHttpError.NotFound('Token not available');
 
     const refreshTokenIndex = cookieArr.findIndex(el => el.includes('refreshToken'));
+    if (refreshTokenIndex === -1) throw new createHttpError.NotFound('Token not available');
     const refresh_token = cookieArr[refreshTokenIndex + 1];
-    const userId = await verifyRefreshToken(refresh_token);
+    const payload = await verifyRefreshToken(refresh_token);
 
-    const token = await generateToken(userId);
-    await generateRefreshToken(userId, res);
+    const token = await generateToken(payload.id);
+    await generateRefreshToken(payload.id, res);
     res.status(201);
     res.send({ access_token: token });
   } catch (error) {
@@ -112,12 +126,16 @@ router.post('/reset-password', async (req: Request, res: Response, next: NextFun
     const { email, password } = result;
 
     const userQuery = User.query();
-    const user = await userQuery.findOne({ email });
+    const user = await userQuery
+      .findOne({ email })
+      .withGraphFetched({
+        customer: true,
+        mover: true
+      });
     if (!user) throw new createHttpError.NotFound('User is not registered');
 
     const hashedPassword = await User.hashPassword(password);
     userQuery.findById(user.id).patch({ password: hashedPassword });
-
     const token = await generateToken(user.id);
     const newRefreshToken = await generateRefreshToken(user.id, res);
 
@@ -132,5 +150,24 @@ router.post('/reset-password', async (req: Request, res: Response, next: NextFun
     next(error);
   }
 });
+
+router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.payload;
+    const response = await User
+      .query()
+      .findById(id)
+      .select('id', 'first_name', 'last_name', 'email')
+      .withGraphFetched({
+        customer: true,
+        mover: true
+      });
+
+    res.status(200);
+    res.send(response)
+  } catch (error) {
+    next(error);
+  }
+})
 
 export default router;

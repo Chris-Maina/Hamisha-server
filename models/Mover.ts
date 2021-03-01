@@ -8,7 +8,9 @@ class Mover extends Model {
   account!: User
   created_at!: Date
 
-  tableName = 'movers';
+  static get tableName() {
+    return 'movers'
+  }
 
   static get relationMappings() {
     return {
