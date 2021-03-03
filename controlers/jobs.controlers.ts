@@ -44,14 +44,16 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     res.status(201);
     res.send(response);
   } catch (error) {
-    if (error.isJoi) return next(new createHttpError.BadRequest());
+    if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
 });
 
 router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const response = await Job.query()
+    const response = await Job
+      .query()
+      .orderBy('created_at', 'desc')
       .withGraphFetched({
         job_type: true
       });

@@ -1,5 +1,6 @@
 import { Model } from 'objection';
 import PaymentType from './PaymentType';
+// import Proposals from './Proposals'
 
 class Job extends Model {
   id!: number
@@ -20,7 +21,7 @@ class Job extends Model {
       job_type: {
         relation: Model.BelongsToOneRelation,
         modelClass: PaymentType,
-        filter: (query: any) => query.select('name'),
+        filter: (query: any) => query.select('id', 'name'),
         join: {
           from: 'jobs.payment_type',
           to: 'payment_types.id'
