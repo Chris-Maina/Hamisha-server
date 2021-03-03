@@ -32,13 +32,9 @@ app.use((_req: Request, _res: Response, next: NextFunction) => {
 });
 
 /* Error handling Middleware */
-app.use((err: any, _req: Request, res: Response) => {
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   res.status(err.status || 500)
-  return res.send({
-    error: {
-      message: err.message,
-    },
-  })
+  res.send({ message: err.message || 'Internal Server Error'})
 });
 
 const PORT = process.env.PORT || 3100;
