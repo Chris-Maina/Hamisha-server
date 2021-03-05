@@ -64,9 +64,9 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.patch('/', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
     const response = await Job.query()
       .patch(req.body)
@@ -85,9 +85,9 @@ router.patch('/', verifyToken, async (req: Request, res: Response, next: NextFun
   }
 });
 
-router.put('/', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
     const response = await Job.query()
       .update(req.body)
@@ -101,6 +101,18 @@ router.put('/', verifyToken, async (req: Request, res: Response, next: NextFunct
       });
     res.status(200);
     res.send(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => { 
+  const { id } = req.params;
+  try {
+    await Job.query().deleteById(id);
+
+    res.status(200);
+    res.send({ message: 'Successfully deleted the job'});
   } catch (error) {
     next(error);
   }
