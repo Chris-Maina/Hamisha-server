@@ -1,10 +1,28 @@
 import { Router, Request, Response, NextFunction } from 'express';
 
-import { Mover, Job } from '../models';
-import { RequestWithPayload } from '../common/interfaces';
+import { Mover, Job, User, Customer } from '../models';
 import { verifyToken } from '../helpers/jwt_helpers';
 
 const router = Router();
+
+router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const response = await User
+      .query()
+      .findById(id)
+      .select('id', 'first_name', 'last_name', 'email')
+      .withGraphFetched({
+        customer: true,
+        mover: true
+      });
+
+    res.status(200);
+    res.send(response)
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.get('/movers', async (_req: Request, res: Response, next: NextFunction) => {
   try {
@@ -26,13 +44,31 @@ router.get('/movers', async (_req: Request, res: Response, next: NextFunction) =
   }
 });
 
-router.patch('/movers', async (req: RequestWithPayload, res: Response, next: NextFunction) => {
+router.patch('/movers/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id } = req.payload;
+    const { id } = req.params;
     const response = await Mover
       .query()
       .patch(req.body)
-      .where('user_id', id)
+      .where('id', id)
+      .withGraphFetched({
+        account: true
+      });
+
+    res.status(200);
+    res.send(response)
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch('/customers/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const response = await Customer
+      .query()
+      .patch(req.body)
+      .where('id', id)
       .withGraphFetched({
         account: true
       });
