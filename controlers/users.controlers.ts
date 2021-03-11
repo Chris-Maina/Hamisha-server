@@ -11,7 +11,7 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
     const response = await User
       .query()
       .findById(id)
-      .select('id', 'first_name', 'last_name', 'email')
+      .select('id', 'first_name', 'last_name', 'email', 'location')
       .withGraphFetched({
         customer: true,
         mover: true
@@ -19,6 +19,26 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
 
     res.status(200);
     res.send(response)
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const response = await User
+      .query()
+      .patch(req.body)
+      .where('id', id)
+      .returning(['id', 'email', 'first_name', 'last_name', 'location'])
+      .withGraphFetched({
+        customer: true,
+        mover: true
+      });
+
+    res.status(200);
+    res.send(response[0])
   } catch (error) {
     next(error);
   }
@@ -44,34 +64,36 @@ router.get('/movers', async (_req: Request, res: Response, next: NextFunction) =
   }
 });
 
-router.patch('/movers/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/movers/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const response = await Mover
       .query()
       .patch(req.body)
       .where('id', id)
-      .withGraphFetched({
-        account: true
-      });
+      .returning('*')
+      // .withGraphFetched({
+      //   account: true
+      // });
 
     res.status(200);
-    res.send(response)
+    res.send(response[0])
   } catch (error) {
     next(error);
   }
 });
 
-router.patch('/customers/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/customers/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     const response = await Customer
       .query()
       .patch(req.body)
       .where('id', id)
-      .withGraphFetched({
-        account: true
-      });
+      .returning('*')
+      // .withGraphFetched({
+      //   account: true
+      // });
 
     res.status(200);
     res.send(response)
