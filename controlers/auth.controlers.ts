@@ -58,7 +58,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       location: response.location
     });
   } catch (error) {
-    if (error.isJoi) return next(new createHttpError.BadRequest());
+    if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
 })
