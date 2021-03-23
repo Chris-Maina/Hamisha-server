@@ -64,6 +64,25 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+
+router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const response = await Job
+      .query()
+      .findById(id)
+      .withGraphFetched({
+        job_type: true,
+        posted_by: true,
+      });
+    res.status(200);
+    res.send(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.patch('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;

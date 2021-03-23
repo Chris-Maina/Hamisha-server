@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+import User from './User';
 import PaymentType from './PaymentType';
 // import Proposals from './Proposals'
 
@@ -26,6 +27,15 @@ class Job extends Model {
           from: 'jobs.payment_type',
           to: 'payment_types.id'
         } 
+      },
+      posted_by: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: User,
+        filter: (query: any) => query.select('id', 'first_name', 'last_name'),
+        join: {
+          from: 'jobs.customer_id',
+          to: 'users.id'
+        }
       }
     }
   }
