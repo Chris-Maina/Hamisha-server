@@ -1,7 +1,7 @@
 import { Model } from 'objection';
 import User from './User';
+import Proposal from './Proposal';
 import PaymentType from './PaymentType';
-// import Proposals from './Proposals'
 
 class Job extends Model {
   id!: number
@@ -35,6 +35,15 @@ class Job extends Model {
         join: {
           from: 'jobs.customer_id',
           to: 'users.id'
+        }
+      },
+      proposals: {
+        relation: Model.HasManyRelation,
+        modelClass: Proposal,
+        filter: (query: any) => query.select('id', 'status'),
+        join: {
+          from: 'jobs.id',
+          to: 'proposals.job_id',
         }
       }
     }
