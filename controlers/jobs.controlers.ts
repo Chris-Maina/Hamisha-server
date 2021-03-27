@@ -55,7 +55,8 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
       .query()
       .orderBy('created_at', 'desc')
       .withGraphFetched({
-        job_type: true
+        job_type: true,
+        proposals: true,
       });
     res.status(200);
     res.send(response);
@@ -75,6 +76,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       .withGraphFetched({
         job_type: true,
         posted_by: true,
+        proposals: true,
       });
     res.status(200);
     res.send(response);
@@ -95,7 +97,8 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
       )
       .first()
       .withGraphFetched({
-        job_type: true
+        job_type: true,
+        proposals: true,
       });
     res.status(200);
     res.send(response);
@@ -116,7 +119,8 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
       )
       .first()
       .withGraphFetched({
-        job_type: true
+        job_type: true,
+        proposals: true,
       });
     res.status(200);
     res.send(response);
