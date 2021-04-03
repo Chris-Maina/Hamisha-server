@@ -17,7 +17,8 @@ import {
   SOCKET_ERRORS,
   PRIVATE_MESSAGE,
   ADD_ROOM_MESSAGE,
-  LOAD_MESSAGES_IN_ROOM
+  LOAD_MESSAGES_IN_ROOM,
+  FETCH_USER_ROOMS
 } from './common/constants';
 import { Message, Room } from './models';
 
@@ -60,6 +61,17 @@ const PORT = process.env.PORT || 3100;
 
 io.on("connection", (socket: Socket) => {
   console.log('Connected to web socket successfully');
+
+  // Handle rooms request
+  socket.on(FETCH_USER_ROOMS, async ({ user_id }) => {
+    try {
+      const response = await Room.query().where("user_id", user_id)
+    } catch (error) {
+      // add error handler that conforms to the error midleware
+      socket.emit(SOCKET_ERRORS, error);
+    }
+  });
+
   // Handle room creation
   socket.on(CREATE_ROOM, async ({ name }) => {
     // API request to create a room
@@ -73,6 +85,7 @@ io.on("connection", (socket: Socket) => {
         const messages = await Message.query().where('room_id', response.id);
         socket.emit(LOAD_MESSAGES_IN_ROOM, messages);
       }
+      // add participants
       socket.join(response.id.toString());
       socket.emit(CREATE_ROOM, response);
     } catch (error) {
@@ -89,12 +102,12 @@ io.on("connection", (socket: Socket) => {
   });
 
   // Handle room messages
-  socket.on(ADD_ROOM_MESSAGE, async ({ roomId, msg, user }) => {
+  socket.on(ADD_ROOM_MESSAGE, async ({ roomId, msg, sender }) => {
     try {
       const response = await Message.query().insert({
         text: msg,
         room_id: roomId,
-        user_id: user.id
+        user_id: sender.id
       });
 
       io.to(roomId.toString()).emit(MESSAGE, response);
