@@ -5,6 +5,19 @@ import { verifyToken } from '../helpers/jwt_helpers';
 
 const router = Router();
 
+router.get('/users', async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await User
+      .query()
+      .select('id', 'first_name', 'last_name', 'email', 'location');
+
+    res.status(200);
+    res.send(response)
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
