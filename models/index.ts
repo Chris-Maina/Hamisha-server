@@ -6,3 +6,4 @@ export { default as Message } from './Message';
 export { default as Proposal } from './Proposal';
 export { default as Customer } from './Customer';
 export { default as PaymentType } from './PaymentType';
+export { default as Participants } from './Participants';
