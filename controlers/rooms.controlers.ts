@@ -11,6 +11,7 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
       participants: {
         user: true
       },
+      messages: true,
     });
     res.status(200);
     res.send(response);
