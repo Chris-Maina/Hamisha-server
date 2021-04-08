@@ -30,7 +30,9 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
         mover: true,
         rooms: {
           messages: true,
-          participants: true,
+          participants: {
+            user: true
+          },
         }
       });
 
@@ -54,7 +56,9 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
         mover: true,
         rooms: {
           messages: true,
-          participants: true,
+          participants: {
+            user: true
+          },
         }
       });
 

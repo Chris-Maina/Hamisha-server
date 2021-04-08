@@ -76,7 +76,9 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         mover: true,
         rooms: {
           messages: true,
-          participants: true,
+          participants: {
+            user: true
+          },
         }
       });
     
