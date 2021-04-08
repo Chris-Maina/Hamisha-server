@@ -4,26 +4,20 @@ dotenv.config();
 import cors from 'cors';
 import morgan from 'morgan';
 import { Model } from 'objection';
-import { Server } from "socket.io";
 import { createServer } from "http";
 import createError from 'http-errors';
 import express, { Request, Response, NextFunction } from 'express';
 
-import routes from './controlers';
 import knex from './knex';
+import routes from './controlers';
+import initializeSocketIO from './socket';
 
 // Bind all Models to a knex instance.
 Model.knex(knex);
 
 const app = express();
 const httpServer = createServer(app);
-export const io = new Server(httpServer, {
-  cors: {
-    origin: true,
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
+initializeSocketIO(httpServer);
 
 /* Middlewares */
 app.use(cors({ credentials: true, origin: true }));
