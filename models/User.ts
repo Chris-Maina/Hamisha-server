@@ -3,6 +3,7 @@ import { Model } from 'objection';
 
 import Mover from './Mover';
 import Customer from './Customer';
+import Room from './Room';
 
 class User extends Model {
   id!: number
@@ -13,6 +14,7 @@ class User extends Model {
   location!: string
   customer!: Customer
   mover!: Mover
+  rooms!: Room[]
 
   static get tableName() {
     return 'users'
@@ -46,6 +48,18 @@ class User extends Model {
           to: 'movers.user_id'
         }
       },
+      rooms: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Room,
+        join: {
+          from: 'users.id',
+          through: {
+            from: "participants.user_id",
+            to: "participants.room_id"
+          },
+          to: "rooms.id"
+        }
+      }
     }
   }
 }

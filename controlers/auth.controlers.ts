@@ -73,7 +73,11 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       .findOne({ email })
       .withGraphFetched({
         customer: true,
-        mover: true
+        mover: true,
+        rooms: {
+          messages: true,
+          participants: true,
+        }
       });
     
     if (!user) throw new createHttpError.NotFound(`User is not registered`);
@@ -93,6 +97,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       last_name: user.last_name,
       customer: user.customer,
       mover: user.mover,
+      rooms: user.rooms,
       access_token: token,
     });
   } catch (error) {
