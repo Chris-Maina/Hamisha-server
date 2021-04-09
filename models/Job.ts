@@ -40,7 +40,7 @@ class Job extends Model {
       proposals: {
         relation: Model.HasManyRelation,
         modelClass: Proposal,
-        filter: (query: any) => query.select('id', 'status'),
+        filter: (query: any) => query.select('id', 'status', 'payment_amount'),
         join: {
           from: 'jobs.id',
           to: 'proposals.job_id',
