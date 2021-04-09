@@ -76,7 +76,12 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       .withGraphFetched({
         job_type: true,
         posted_by: true,
-        proposals: true,
+        proposals: {
+          mover: {
+            account: true,
+          },
+          job_type: true
+        },
       });
     res.status(200);
     res.send(response);
