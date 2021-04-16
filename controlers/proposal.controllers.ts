@@ -25,7 +25,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       payment_amount,
     } = result;
 
-    console.log('job id', job_id, 'mover id', mover_id)
     const hasSubmitted = await Proposal.query()
       .where('job_id', job_id)
       .where('mover_id', mover_id);
@@ -45,6 +44,27 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       res.send(response);
   } catch (error) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
+    next(error);
+  }
+});
+
+router.patch("/:id", verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    // Find proposal with id
+    const proposal = await Proposal.query().findById(id);
+    if (!proposal) throw new createHttpError.NotFound("Proposal does not exist");
+
+    // Update
+    const response: any = await Proposal
+      .query()
+      .patch(req.body)
+      .where("id", id)
+      .returning(['id', 'status', 'payment_amount', 'created_at']);
+
+    res.status(200);
+    res.send(response[0]);
+  } catch (error) {
     next(error);
   }
 });
