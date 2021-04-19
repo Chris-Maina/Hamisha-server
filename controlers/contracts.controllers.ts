@@ -1,8 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { RequestWithPayload } from "../common/interfaces";
-import { verifyToken } from "../helpers/jwt_helpers";
+import createHttpError from "http-errors";
 import { Contract, User } from "../models";
+import { verifyToken } from "../helpers/jwt_helpers";
 import { contractSchema } from "../schemas/auth.schema";
+import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
 
@@ -54,6 +55,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     res.status(200);
     res.send(response);
   } catch (error) {
+    if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
 });
