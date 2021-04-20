@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
 import { Contract, User } from "../models";
+import { contractSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { contractSchema } from "../schemas/auth.schema";
 import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
