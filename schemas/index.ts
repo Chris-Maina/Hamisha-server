@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { CONTRACT_STATUS } from '../common/constants';
 
 export const loginSchema = Joi.object({
   email: Joi.string().email().lowercase().required(),
@@ -30,7 +31,19 @@ export const jobSchema = Joi.object({
 });
 
 export const contractSchema = Joi.object({
-  proposal_id: Joi.number().required(),
-  start_time: Joi.date().required(),
   title: Joi.string().required(),
+  mover_id: Joi.number().optional(),
+  start_time: Joi.date().required(),
+  customer_id: Joi.number().optional(),
+  payment_type: Joi.number().required(),
+  payment_amount: Joi.number().required(),
+  proposal_id: Joi.number().required(),
+  status: Joi.string().optional().valid(
+    CONTRACT_STATUS.DRAFT,
+    CONTRACT_STATUS.SENT,
+    CONTRACT_STATUS.NEGOTIATE,
+    CONTRACT_STATUS.DECLINED,
+    CONTRACT_STATUS.ACCEPTED,
+    CONTRACT_STATUS.CLOSED,
+  )
 });
