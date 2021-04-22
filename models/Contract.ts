@@ -13,6 +13,7 @@ class Contract extends Model {
       customer: {
         relation: Model.BelongsToOneRelation,
         modelClass: Customer,
+        filter: (query: any) => query.select('id', 'user_id'),
         join: {
           from: "contracts.customer_id",
           to: "customers.id"
@@ -21,6 +22,7 @@ class Contract extends Model {
       mover: {
         relation: Model.BelongsToOneRelation,
         modelClass: Mover,
+        filter: (query: any) => query.select('id', 'user_id'),
         join: {
           from: "contracts.mover_id",
           to: "movers.id"

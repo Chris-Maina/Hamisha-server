@@ -22,7 +22,13 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
       response = await Contract
         .query()
         .where('customer_id', user.customer.id)
-        .orderBy('start_time', 'desc');
+        .orderBy('start_time', 'desc')
+        .withGraphFetched({
+          mover: {
+            account: true
+          },
+          contract_type: true
+        });
     } else {
       response = await Contract
         .query()
@@ -45,11 +51,15 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       .query()
       .insert(result)
       .returning(
-        ['id', 'payment_amount', 'start_time', 'payment_type', 'title']
+        [
+          'id', 'payment_amount', 'start_time', 'payment_type', 'title', 'status'
+        ]
       )
       .withGraphFetched({
-        customer: true,
-        mover: true
+        mover: {
+          account: true
+        },
+        contract_type: true
       });
   
     res.status(200);
