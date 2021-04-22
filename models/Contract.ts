@@ -1,6 +1,7 @@
 import { Model } from "objection";
 import Customer from "./Customer";
 import Mover from "./Mover";
+import PaymentType from "./PaymentType";
 
 class Contract extends Model {
   static get tableName() {
@@ -24,9 +25,18 @@ class Contract extends Model {
           from: "contracts.mover_id",
           to: "movers.id"
         }
-      }
-    }
-  }
-}
+      },
+      contract_type: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: PaymentType,
+        filter: (query: any) => query.select('id', 'name'),
+        join: {
+          from: "contracts.payment_type",
+          to: "payment_types.id"
+        },
+      },
+    };
+  };
+};
 
 export default Contract;
