@@ -14,6 +14,15 @@ export const PROPOSAL_STATUS = {
   JOB_UNSUCCESS: 'job finished(unsuccessfully)'
 };
 
+export const CONTRACT_STATUS = {
+  DRAFT: 'draft',
+  SENT: 'sent for approval',
+  NEGOTIATE: 'negotiate',
+  DECLINED: 'contract declined',
+  ACCEPTED: 'contract accepted',
+  CLOSED: 'contract closed',
+};
+
 export const MESSAGE = 'events/MESSAGE';
 export const JOIN_ROOM = 'events/JOIN_ROOM';
 export const CREATE_ROOM = 'events/CREATE_ROOM';
