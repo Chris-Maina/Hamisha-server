@@ -9,8 +9,22 @@ import { PROPOSAL_STATUS } from "../common/constants";
 
 const router = Router();
 
-router.get('/', verifyToken, (req: Request, res: Response, next: NextFunction) => {
+router.get('/', verifyToken, async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await Proposal
+      .query()
+      .withGraphFetched({
+        mover: {
+          account: true,
+        },
+        job_type: true
+      });
 
+    res.status(200);
+    res.send(response);
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
