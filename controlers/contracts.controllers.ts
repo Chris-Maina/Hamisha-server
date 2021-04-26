@@ -22,7 +22,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
       response = await Contract
         .query()
         .where('customer_id', user.customer.id)
-        .orderBy('start_time', 'desc')
+        .orderBy('created_at', 'desc')
         .withGraphFetched({
           mover: {
             account: true
@@ -33,7 +33,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
       response = await Contract
         .query()
         .where('mover_id', user.mover.id)
-        .orderBy('start_time', 'desc');
+        .orderBy('created_at', 'desc');
     }
 
     res.status(200);

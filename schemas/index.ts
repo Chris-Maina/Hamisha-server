@@ -37,7 +37,7 @@ export const contractSchema = Joi.object({
   customer_id: Joi.number().optional(),
   payment_type: Joi.number().required(),
   payment_amount: Joi.number().required(),
-  proposal_id: Joi.number().required(),
+  proposal_id: Joi.number().optional(),
   status: Joi.string().optional().valid(
     CONTRACT_STATUS.DRAFT,
     CONTRACT_STATUS.SENT,
