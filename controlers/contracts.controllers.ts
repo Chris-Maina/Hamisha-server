@@ -3,6 +3,7 @@ import createHttpError from "http-errors";
 import { Contract, User } from "../models";
 import { contractSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
+import { CONTRACT_STATUS } from "../common/constants";
 import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
@@ -47,6 +48,17 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
   try {
     const result = await contractSchema.validateAsync(req.body);
 
+    // Check if contract is unique
+    const contractExists: any = await Contract.query().findOne({
+      customer_id: result.customer_id,
+      mover_id: result.mover_id,
+    });
+    if (contractExists
+      && (
+        contractExists.status !== CONTRACT_STATUS.CLOSED || 
+        contractExists.status !== CONTRACT_STATUS.DECLINED
+      )
+    ) throw new createHttpError.Conflict("A contract exists between shared contacts");
     const response = await Contract
       .query()
       .insert(result)

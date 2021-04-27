@@ -32,9 +32,9 @@ export const jobSchema = Joi.object({
 
 export const contractSchema = Joi.object({
   title: Joi.string().required(),
-  mover_id: Joi.number().optional(),
+  mover_id: Joi.number().required(),
   start_time: Joi.date().required(),
-  customer_id: Joi.number().optional(),
+  customer_id: Joi.number().required(),
   payment_type: Joi.number().required(),
   payment_amount: Joi.number().required(),
   proposal_id: Joi.number().optional(),
