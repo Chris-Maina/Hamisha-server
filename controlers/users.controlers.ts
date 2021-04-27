@@ -71,7 +71,7 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
 
 router.get('/movers', async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const response: any = await Mover
+    const response: any[] = await Mover
       .query()
       .orderBy('created_at', 'desc') 
       .withGraphFetched({
@@ -79,11 +79,7 @@ router.get('/movers', async (_req: Request, res: Response, next: NextFunction) =
       });
 
     res.status(200);
-    res.send({
-      ...response.account,
-      created_at: response.created_at,
-      description: response.description
-    });
+    res.send(response);
   } catch (error) {
     next(error);
   }
