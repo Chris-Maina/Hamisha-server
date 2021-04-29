@@ -7,6 +7,9 @@ import { CONTRACT_STATUS } from "../common/constants";
 import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
+const contractFields: string[] = [
+  'id', 'payment_amount', 'start_time', 'payment_type', 'title', 'status'
+];
 
 router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
@@ -62,11 +65,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const response = await Contract
       .query()
       .insert(result)
-      .returning(
-        [
-          'id', 'payment_amount', 'start_time', 'payment_type', 'title', 'status'
-        ]
-      )
+      .returning(contractFields)
       .withGraphFetched({
         mover: {
           account: true
@@ -78,6 +77,54 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     res.send(response);
   } catch (error) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
+    next(error);
+  }
+});
+
+router.patch('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const response = await Contract
+      .query()
+      .patch(req.body)
+      .where('id', id)
+      .returning(contractFields)
+      .first()
+      .withGraphFetched({
+        mover: {
+          account: true
+        },
+        contract_type: true
+      });
+    
+    res.status(200);
+    res.send(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    const response = await Contract
+      .query()
+      .update(req.body)
+      .where('id', id)
+      .returning(contractFields)
+      .first()
+      .withGraphFetched({
+        mover: {
+          account: true
+        },
+        contract_type: true
+      });
+
+    res.status(200);
+    res.send(response);
+  } catch (error) {
     next(error);
   }
 });
