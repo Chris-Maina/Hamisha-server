@@ -130,4 +130,16 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
   }
 });
 
+router.delete('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  try {
+    await Contract.query().deleteById(id);
+
+    res.status(200);
+    res.send({ message: 'Successfully deleted the contract' });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
