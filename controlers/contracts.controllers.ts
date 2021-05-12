@@ -1,15 +1,34 @@
 import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
-import { Contract, User } from "../models";
+import { Contract, Proposal, User } from "../models";
 import { contractSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { CONTRACT_STATUS } from "../common/constants";
+import { CONTRACT_STATUS, PROPOSAL_STATUS } from "../common/constants";
 import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
 const contractFields: string[] = [
   'id', 'payment_amount', 'start_time', 'payment_type', 'title', 'status'
 ];
+
+const updateProposalFromContract = async (contract: any) => {
+  if (contract.status === CONTRACT_STATUS.ACCEPTED) {
+    await Proposal
+      .query()
+      .patch({ status: PROPOSAL_STATUS.JOB_START })
+      .where("id", contract.proposal_id); 
+  } else if (contract.status === CONTRACT_STATUS.DECLINED) {
+    await Proposal
+      .query()
+      .patch({ status: PROPOSAL_STATUS.JOB_UNSUCCESS })
+      .where("id", contract.proposal_id);
+  } else if (contract.status === CONTRACT_STATUS.CLOSED) {
+    await Proposal
+      .query()
+      .patch({ status: PROPOSAL_STATUS.JOB_SUCCESS })
+      .where("id", contract.proposal_id);
+  }
+}
 
 router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
@@ -86,7 +105,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
   try {
     const { id } = req.params;
 
-    const response = await Contract
+    const response: any = await Contract
       .query()
       .patch(req.body)
       .where('id', id)
@@ -98,6 +117,8 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
         },
         contract_type: true
       });
+
+    updateProposalFromContract(response);
     
     res.status(200);
     res.send(response);
@@ -122,6 +143,8 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         },
         contract_type: true
       });
+
+    updateProposalFromContract(response);
 
     res.status(200);
     res.send(response);
