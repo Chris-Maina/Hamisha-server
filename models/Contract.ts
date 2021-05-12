@@ -2,6 +2,7 @@ import { Model } from "objection";
 import Customer from "./Customer";
 import Mover from "./Mover";
 import PaymentType from "./PaymentType";
+import Proposal from "./Proposal";
 
 class Contract extends Model {
   static get tableName() {
@@ -37,6 +38,15 @@ class Contract extends Model {
           to: "payment_types.id"
         },
       },
+      proposal: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Proposal,
+        filter: (query: any) => query.select('id', 'customer_comment', 'mover_comment'),
+        join: {
+          from: "contracts.proposal_id",
+          to: "proposals.id"
+        },
+      }
     };
   };
 };
