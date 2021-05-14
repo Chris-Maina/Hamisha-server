@@ -9,8 +9,9 @@ import {
   ADD_ROOM_MESSAGE,
   LOAD_MESSAGES_IN_ROOM,
   FETCH_MESSAGES_FROM_ROOM,
+  FETCH_USER_ROOMS_RESPONSE,
 } from './common/constants';
-import { Message, Participants, Room } from './models';
+import { Message, Participants, Room, User } from './models';
 
 const initializeSocketIO = (httpServer: any) => {
   const io = new Server(httpServer, {
@@ -69,10 +70,23 @@ const initializeSocketIO = (httpServer: any) => {
       }
     });
 
-    // Handle rooms request on connect
+    // Handle fetching user rooms.
     socket.on(FETCH_USER_ROOMS, async ({ user_id }) => {
       try {
-        const response = await Room.query().where("user_id", user_id);
+        const response = await User
+          .query()
+          .select('id', 'email')
+          .findById(user_id)
+          .withGraphFetched({
+            rooms: {
+              messages: true,
+              participants: {
+                user: true
+              },
+            }
+          });
+
+        socket.emit(FETCH_USER_ROOMS_RESPONSE, response.rooms);
       } catch (error) {
         // add error handler that conforms to the error midleware
         socket.emit(SOCKET_ERRORS, error);
@@ -83,8 +97,13 @@ const initializeSocketIO = (httpServer: any) => {
     // Handle leave room/switch rooms
 
     // Handle joining room
-    socket.on(JOIN_ROOM, ({ room_id }) => {
+    socket.on(JOIN_ROOM, async ({ room_id }) => {
+      const response = await Message
+        .query()
+        .where('room_id', room_id);
+
       socket.join(room_id.toString());
+      socket.emit(LOAD_MESSAGES_IN_ROOM, response);
     });
   });
 }
