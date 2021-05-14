@@ -12,7 +12,7 @@ const knexConfig: KnexConfig = {
 
   development: {
     client: "pg",
-    connection: process.env.DATABASE_URI,
+    connection: process.env.DATABASE_URL,
     migrations: {
       directory: './knex/migrations'
     },
@@ -39,7 +39,7 @@ const knexConfig: KnexConfig = {
 
   production: {
     client: "pg",
-    connection: process.env.DATABASE_URI,
+    connection: process.env.DATABASE_URL,
     migrations: {
       directory: "./knex/migrations"
     },
