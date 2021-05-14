@@ -28,12 +28,6 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
       .withGraphFetched({
         customer: true,
         mover: true,
-        rooms: {
-          messages: true,
-          participants: {
-            user: true
-          },
-        }
       });
 
     res.status(200);
@@ -54,12 +48,6 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
       .withGraphFetched({
         customer: true,
         mover: true,
-        rooms: {
-          messages: true,
-          participants: {
-            user: true
-          },
-        }
       });
 
     res.status(200);
