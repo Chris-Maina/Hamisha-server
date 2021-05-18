@@ -44,7 +44,7 @@ const knexConfig: KnexConfig = {
       user: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       port: process.env.DATABASE_PORT,
-      host: "host",
+      host: process.env.DATABASE_HOST,
       ssl: true
     },
     migrations: {
