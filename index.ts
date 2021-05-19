@@ -17,7 +17,7 @@ Model.knex(knex);
 
 const app = express();
 const httpServer = createServer(app);
-// initializeSocketIO(httpServer);
+initializeSocketIO(httpServer);
 
 /* Middlewares */
 app.use(cors({ credentials: true, origin: true }));
