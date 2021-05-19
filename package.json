@@ -7,7 +7,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --ext ts index.ts",
-    "start": "tsc && node dist/index",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "postinstall": "yarn build",
     "migrate:up": "./node_modules/.bin/knex migrate:up",
     "migrate:down": "./node_modules/.bin/knex migrate:down",
     "seed:make": "./node_modules/.bin/knex seed:make -x ts",
