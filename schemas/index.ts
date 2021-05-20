@@ -9,9 +9,9 @@ export const loginSchema = Joi.object({
 export const registerSchema = loginSchema.keys({
   first_name: Joi.string().required(),
   last_name: Joi.string().required(),
-  type: Joi.string().optional(),
+  type: Joi.string().required(),
   description: Joi.string().optional().allow(''), // empty strings are not allowed by default and must be enabled with allow('')
-  location: Joi.string().optional()
+  location: Joi.string().optional().allow('')
 });
 
 export const proposalSchema = Joi.object({
