@@ -39,7 +39,6 @@ const knexConfig: KnexConfig = {
 
   production: {
     client: "pg",
-    // connection: process.env.DATABASE_URL,
     connection: {
       host: process.env.DATABASE_HOST,
       port: process.env.DATABASE_PORT,

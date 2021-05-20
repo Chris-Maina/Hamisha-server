@@ -10,7 +10,7 @@ export const registerSchema = loginSchema.keys({
   first_name: Joi.string().required(),
   last_name: Joi.string().required(),
   type: Joi.string().optional(),
-  description: Joi.string().optional(),
+  description: Joi.string().optional().allow(''), // empty strings are not allowed by default and must be enabled with allow('')
   location: Joi.string().optional()
 });
 
