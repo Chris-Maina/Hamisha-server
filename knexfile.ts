@@ -39,15 +39,15 @@ const knexConfig: KnexConfig = {
 
   production: {
     client: "pg",
-    connection: process.env.DATABASE_URL,
-    // connection: {
-    //   database: process.env.DATABASE_NAME,
-    //   user: process.env.DATABASE_USER,
-    //   password: process.env.DATABASE_PASSWORD,
-    //   port: process.env.DATABASE_PORT,
-    //   host: process.env.DATABASE_HOST,
-    //   ssl: { rejectUnauthorized: false }
-    // },
+    // connection: process.env.DATABASE_URL,
+    connection: {
+      host: process.env.DATABASE_HOST,
+      port: process.env.DATABASE_PORT,
+      user: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME,
+      ssl: { rejectUnauthorized: false }
+    },
     migrations: {
       directory: "./knex/migrations"
     },
