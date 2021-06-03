@@ -1,4 +1,4 @@
-import { request } from "http";
+import { request } from "https"
 
 export interface MpesaToken {
   access_token: string,
@@ -8,10 +8,10 @@ export interface MpesaToken {
 interface optionsDef {
   host: string,
   path: string,
-  port?: string,
+  port?: number,
   method?: string,
   headers?: {
-    [key: string]: string
+    [key: string]: string,
   }
 }
 
@@ -25,6 +25,8 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
   return new Promise((resolve, reject) => {
     const callback = function (response: any) {
       let output = "";
+      response.setEncoding('utf8');
+
       response.on('data', function (chunk: any) {
         output += chunk;
       });
@@ -33,30 +35,47 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
         resolve(JSON.parse(output));
       });
     }
+
     const req = request(options, callback);
 
-    if (options.method === "POST") {
-      req.write(postPayload);
-    }
-
     req.on('error', function (err) {
-      // Handle error
       reject(err)
     });
+
+    if (options.method === "POST") {
+      req.write(JSON.stringify(postPayload));
+    }
+
     req.end();
   })
 }
 
-export const getMpesaAuthToken = (): Promise<any> => {
+export const getMpesaAuthToken = async (): Promise<any> => {
 
-  const auth = "Basic " +  Buffer.from(process.env.CONSUMER_KEY + ":" + process.env.CONSUMER_SECRET).toString("base64");
   const options = {
     host: "sandbox.safaricom.co.ke",
     path: "/oauth/v1/generate?grant_type=client_credentials",
+    method: "GET",
     headers: {
-      "Authorization": auth,
+      "Content-Type": "application/json",
+      "Authorization": `Basic ${Buffer.from(process.env.CONSUMER_KEY + ":" + process.env.CONSUMER_SECRET).toString("base64")}`,
     }
   }
-
   return makeApiRequest(options);
+}
+
+const pad = (n: number): string => (n < 10 ? '0' : '') + n;
+
+/**
+ * @description returns timestamp in the format YYYYMMDDHHMMSS
+ * @returns {string} date
+ */
+export const getTimestamp = (): string => {
+  const date = new Date();
+  return date.getFullYear() +
+    pad(date.getMonth() + 1) +
+    pad(date.getDate()) +
+    pad(date.getHours()) +
+    pad(date.getMinutes()) +
+    pad(date.getSeconds());
 }
