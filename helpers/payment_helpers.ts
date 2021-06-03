@@ -27,6 +27,10 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
       let output = "";
       response.setEncoding('utf8');
 
+      if (response.statusCode !== 200) {
+        reject(new Error("Could not process your payment"))
+      }
+
       response.on('data', function (chunk: any) {
         output += chunk;
       });
