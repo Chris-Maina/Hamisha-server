@@ -4,7 +4,8 @@ import {
   Response,
   NextFunction
 } from "express";
-import { getMpesaAuthToken, makeApiRequest } from "../helpers/payment_helpers";
+import createHttpError from "http-errors";
+import { getMpesaAuthToken, makeApiRequest, getTimestamp } from "../helpers/payment_helpers";
 
 const router = Router();
 
@@ -17,20 +18,20 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
      * if no, generate a new token
      */
     const token = await getMpesaAuthToken();
-    console.log(">>>>> mpesa token", token);
 
-    const timeStamp = Date.now();
+    const timeStamp = getTimestamp();
+    const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
     const payload = {
-      "BusinessShortCode": process.env.BUSINESS_SHORT_CODE,
-      "Password": Buffer.from(`${process.env.BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
+      "BusinessShortCode": BUSINESS_SHORT_CODE,
+      "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
       "Timestamp": timeStamp,
       "TransactionType": "CustomerPayBillOnline",
       "Amount": amount,
       "PartyA": phoneNumber, // the MSISDN sending the funds
-      "PartyB": process.env.BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
+      "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
       "PhoneNumber": phoneNumber, // the MSISDN sending the funds
       "CallBackURL": "https://hamisha-api.herokuapp.com/api/payments/mpesa",
-      "AccountReference": " ",
+      "AccountReference": "Hamisha", // Identifier of the transaction for CustomerPayBillOnline transaction type
       "TransactionDesc": `Payment for job with id ${jobId}`
     }
     const options = {
@@ -38,16 +39,15 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       path: "/mpesa/stkpush/v1/processrequest",
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
     const response = await makeApiRequest(options, payload);
-
     res.status(201);
-    res.send(response)
-
+    res.send(response);
   } catch (error) {
-    next(error);
+    next(new createHttpError.BadRequest(error.message));
   }
 });
 
