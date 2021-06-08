@@ -57,7 +57,13 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         .query()
         .where('mover_id', user.mover.id)
         .where('status', '!=', CONTRACT_STATUS.DRAFT) // != and <> both mean not equal
-        .orderBy('created_at', 'desc');
+        .orderBy('created_at', 'desc')
+        .withGraphFetched({
+          customer: {
+            account: true
+          },
+          contract_type: true
+        });;
     }
 
     res.status(200);
