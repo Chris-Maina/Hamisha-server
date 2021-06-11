@@ -171,4 +171,27 @@ router.delete('/:id', verifyToken, async (req: Request, res: Response, next: Nex
   }
 });
 
+router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  try {
+    const response = await Contract
+      .query()
+      .findById(id)
+      .withGraphFetched({
+        mover: {
+          account: true
+        },
+        customer: {
+          account: true
+        },
+        contract_type: true
+      });
+
+    res.status(200);
+    res.send(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
