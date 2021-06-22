@@ -23,6 +23,11 @@ export const CONTRACT_STATUS = {
   CLOSED: 'contract closed',
 };
 
+export const BILLING_STATUS = {
+  PAID: "paid",
+  NOT_PAID: "not paid"
+}
+
 export const MESSAGE = 'events/MESSAGE';
 export const JOIN_ROOM = 'events/JOIN_ROOM';
 export const CREATE_ROOM = 'events/CREATE_ROOM';

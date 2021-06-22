@@ -1,8 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
+import { BILLING_STATUS } from "../common/constants";
 import { RequestWithPayload } from "../common/interfaces";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { Invoice } from "../models";
+import { Invoice, Billing } from "../models";
 import { invoiceSchema } from "../schemas";
 
 const router = Router();
@@ -47,6 +48,15 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         recipient: true,
       });
 
+    // Create a billing for issued_to user
+    if (response) {
+      const billingPayload = {
+        invoice_id: response.id,
+        user_id: response.issued_to,
+        status: BILLING_STATUS.NOT_PAID,
+      }
+      await Billing.query().insert(billingPayload);
+    }
     res.status(201);
     res.send(response);
   } catch (error) {

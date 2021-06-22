@@ -6,6 +6,7 @@ class Billing extends Model {
   id!: number
   invoice_id!: number
   user_id!: number
+  status!: string
 
   static get tableName() {
     return "billings"
