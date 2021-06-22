@@ -47,3 +47,12 @@ export const contractSchema = Joi.object({
     CONTRACT_STATUS.CLOSED,
   )
 });
+
+export const invoiceSchema = Joi.object({
+  description: Joi.string().required(),
+  issued_by: Joi.number().required(),
+  issued_to: Joi.number().required(),
+  contract_id: Joi.number().required(),
+  due_date: Joi.date().optional(),
+  total: Joi.number().required(),
+});
