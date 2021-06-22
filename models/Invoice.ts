@@ -8,7 +8,8 @@ class Invoice extends Model {
   updated_at!: Date
   contract_id!: number
   description!: string
-  user_id!: number
+  issued_by!: number
+  issued_to!: number
 
   static get tableName() {
     return "invoices";
