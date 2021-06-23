@@ -3,7 +3,7 @@ export { default as User } from './User';
 export { default as Room } from './Room';
 export { default as Mover } from './Mover';
 export { default as Invoice } from './Invoice';
-export { default as Billing } from './Billing';
+export { default as Payment } from './Payment';
 export { default as Message } from './Message';
 export { default as Contract } from './Contract';
 export { default as Proposal } from './Proposal';

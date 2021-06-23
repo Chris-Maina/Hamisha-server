@@ -1,5 +1,6 @@
 import { Model } from 'objection';
 import Contract from './Contract';
+import Payment from './Payment';
 import User from './User';
 
 class Invoice extends Model {
@@ -43,6 +44,15 @@ class Invoice extends Model {
         join: {
           from: "invoices.contract_id",
           to: "contracts.id"
+        }
+      },
+      payment: {
+        relation: Model.HasOneRelation,
+        modelClass: Payment,
+        filter: (query: any) => query.select('id', 'payment_date'),
+        join: {
+          from: "invoices.id",
+          to: "payments.invoice_id"
         }
       }
     }
