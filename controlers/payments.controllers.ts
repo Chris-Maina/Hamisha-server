@@ -10,7 +10,7 @@ import { getMpesaAuthToken, makeApiRequest, getTimestamp } from "../helpers/paym
 const router = Router();
 
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
-  const { amount, jobId, phoneNumber } = req.body;
+  const { amount, invoice_id, phoneNumber } = req.body;
   try {
     /**
      * Check to see if you have mpesa token
@@ -30,9 +30,9 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       "PartyA": phoneNumber, // the MSISDN sending the funds
       "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
       "PhoneNumber": phoneNumber, // the MSISDN sending the funds
-      "CallBackURL": "https://hamisha-api.herokuapp.com/api/payments/mpesa",
+      "CallBackURL": `https://hamisha-api.herokuapp.com/api/payments/mpesa?invoice_id=${invoice_id}`,
       "AccountReference": "Hamisha", // Identifier of the transaction for CustomerPayBillOnline transaction type
-      "TransactionDesc": `Payment for job with id ${jobId}`
+      "TransactionDesc": `Payment for invoice with id ${invoice_id}`
     }
     const options = {
       host: "sandbox.safaricom.co.ke",
@@ -54,8 +54,14 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 // Webhook to listen to lipa na mpesa stkpush response
 router.post('/mpesa', (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { invoice_id } = req.query;
+    console.log("Invoice", invoice_id);
     console.log("response from mpesa", req.body);
-
+    // ResultCode of 0 is a success
+    if (req.body.Body.stkCallback.ResultCode === 0) {
+      // Create a payment record
+      console.log("CallbackMetadata", req.body.Body.stkCallback.CallbackMetadata);
+    }
     // respond to safaricom servers with a success message
     res.json({
       "ResponseCode": "00000000",
