@@ -11,20 +11,30 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
   try {
     const { id } = req.payload;
     const { contract_id } = req.query;
+    let response;
 
-    // Current implementation requires contract_id. 
-    // May change later to fetch all invoices of a user
-    if (!contract_id) throw new createHttpError.BadRequest("contract_id not available");
+    if (!contract_id) {
+      // Get invoices/bills issued to customer
+      response = await Invoice
+        .query()
+        .where("issued_to", id)
+        .withGraphFetched({
+          contract: true,
+          payment: true
+        });
+    } else {
+      // Get invoises issued by mover
+      response = await Invoice
+        .query()
+        .where("issued_by", id)
+        .where("contract_id", contract_id.toString())
+        .withGraphFetched({
+          contract: true,
+          creator: true,
+          recipient: true,
+        });
+    }
 
-    const response = await Invoice
-      .query()
-      .where("issued_by", id)
-      .where("contract_id", contract_id.toString())
-      .withGraphFetched({
-        contract: true,
-        creator: true,
-        recipient: true,
-      });
 
     res.status(200);
     res.send(response);
