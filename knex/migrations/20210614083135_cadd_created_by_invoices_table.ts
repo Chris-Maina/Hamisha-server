@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.table('billings', tbl => {
+  await knex.schema.table('invoices', tbl => {
     tbl.renameColumn('issued_by', 'user_id');
     tbl.dropColumn('issued_to');
   });
