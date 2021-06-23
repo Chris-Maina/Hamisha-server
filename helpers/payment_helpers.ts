@@ -83,3 +83,28 @@ export const getTimestamp = (): string => {
     pad(date.getMinutes()) +
     pad(date.getSeconds());
 }
+
+interface CallbackMetadataItem {
+  Name: string;
+  Value: any;
+}
+
+/**
+ * @description maps mpesa keys to snake case
+ * @param itemArray {CallbackMetadataItem}
+ * @returns {[string]: any} 
+ */
+export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
+  const KEYS: {[x: string]: string} = {
+    'MpesaReceiptNumber': 'mpesa_receipt_no',
+    'Amount': 'amount',
+    'PhoneNumber': 'phone_number',
+    'TransactionDate': 'payment_date'
+  };
+  return itemArray.reduce((acc, curr) => {
+    if (KEYS[curr.Name]) {
+      return { ...acc, [KEYS[curr.Name]]: curr.Value }
+    }
+    return acc;
+  }, {});
+}
