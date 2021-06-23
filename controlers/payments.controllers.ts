@@ -5,7 +5,13 @@ import {
   NextFunction
 } from "express";
 import createHttpError from "http-errors";
-import { getMpesaAuthToken, makeApiRequest, getTimestamp } from "../helpers/payment_helpers";
+import {
+  getTimestamp,
+  makeApiRequest,
+  getMpesaAuthToken,
+  mapMpesaKeysToSnakeCase
+} from "../helpers/payment_helpers";
+import { Payment } from "../models";
 
 const router = Router();
 
@@ -52,15 +58,15 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // Webhook to listen to lipa na mpesa stkpush response
-router.post('/mpesa', (req: Request, res: Response, next: NextFunction) => {
+router.post('/mpesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id } = req.query;
-    console.log("Invoice", invoice_id);
-    console.log("response from mpesa", req.body);
     // ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode === 0) {
       // Create a payment record
-      console.log("CallbackMetadata", req.body.Body.stkCallback.CallbackMetadata);
+      const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
+      payload['invoice_id'] = invoice_id;
+      await Payment.query().insert(payload);
     }
     // respond to safaricom servers with a success message
     res.json({
