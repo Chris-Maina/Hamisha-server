@@ -10,6 +10,10 @@ class Payment extends Model {
   static get tableName() {
     return "payments"
   }
+
+  static get idColumn() {
+    return 'mpesa_receipt_no';
+  }
 }
 
 export default Payment;
