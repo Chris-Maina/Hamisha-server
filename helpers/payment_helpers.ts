@@ -89,25 +89,37 @@ interface CallbackMetadataItem {
   Value: any;
 }
 
+const KEYS: { [x: string]: string } = {
+  'MpesaReceiptNumber': 'mpesa_receipt_no',
+  'Amount': 'amount',
+  'PhoneNumber': 'phone_number',
+  'TransactionDate': 'payment_date'
+};
+
 /**
  * @description maps mpesa keys to snake case
  * @param itemArray {CallbackMetadataItem}
  * @returns {[string]: any} 
  */
 export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
-  const KEYS: {[x: string]: string} = {
-    'MpesaReceiptNumber': 'mpesa_receipt_no',
-    'Amount': 'amount',
-    'PhoneNumber': 'phone_number',
-    'TransactionDate': 'payment_date'
-  };
   return itemArray.reduce((acc, curr) => {
     if (KEYS[curr.Name]) {
       return { 
         ...acc,
-        [KEYS[curr.Name]]: KEYS[curr.Name] === KEYS['TransactionDate'] ? new Date(curr.Value) : curr.Value
+        [KEYS[curr.Name]]: formatMpesaValues(KEYS[curr.Name], curr.Value)
       }
     }
     return acc;
   }, {});
+}
+
+const formatMpesaValues = (key: string, value: any) => {
+  switch (key) {
+    case KEYS['TransactionDate']:
+      return new Date(value);
+    case KEYS['PhoneNumber']:
+      return value.toString();
+    default:
+      return value;
+  }
 }
