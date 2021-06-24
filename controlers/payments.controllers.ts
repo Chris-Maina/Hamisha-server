@@ -74,6 +74,7 @@ router.post('/mpesa', async (req: Request, res: Response, next: NextFunction) =>
       "ResponseDesc": "success"
     });
   } catch (error) {
+    console.log(">>>>>> Payment error", error);
     next(error);
   }
 })
