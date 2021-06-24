@@ -69,7 +69,7 @@ export const generateRefreshToken = (userId: Number, response: Response): Promis
         maxAge: 259200000,
         httpOnly: true,
         secure: false,
-        sameSite: 'strict',
+        sameSite: 'none',
         path: '/'
       });
       resolve(token);
