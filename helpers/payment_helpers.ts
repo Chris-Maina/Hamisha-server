@@ -103,7 +103,10 @@ export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
   };
   return itemArray.reduce((acc, curr) => {
     if (KEYS[curr.Name]) {
-      return { ...acc, [KEYS[curr.Name]]: curr.Value }
+      return { 
+        ...acc,
+        [KEYS[curr.Name]]: KEYS[curr.Name] === KEYS['TransactionDate'] ? new Date(curr.Value) : curr.Value
+      }
     }
     return acc;
   }, {});
