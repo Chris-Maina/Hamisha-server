@@ -66,7 +66,6 @@ router.post('/mpesa', async (req: Request, res: Response, next: NextFunction) =>
       // Create a payment record
       const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
       payload['invoice_id'] = parseInt(invoice_id as string, 10);
-      console.log(">>>>>> Payload", payload);
       await Payment.query().insert(payload);
     }
     // respond to safaricom servers with a success message
@@ -75,7 +74,6 @@ router.post('/mpesa', async (req: Request, res: Response, next: NextFunction) =>
       "ResponseDesc": "success"
     });
   } catch (error) {
-    console.log(">>>>>> Payment error", error);
     next(error);
   }
 })
