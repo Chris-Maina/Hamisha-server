@@ -20,12 +20,21 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         customer: true,
       });
 
-    if (user.customer) {
-      // Get invoices/bills issued to customer
+    if (user.customer && !contract_id) {
+      // Get bills issued to customer
       response = await Invoice
         .query()
         .where("issued_to", id)
-        .where("contract_id", contract_id!.toString())
+        .withGraphFetched({
+          contract: true,
+          payment: true
+        });
+    } else if (user.customer) {
+      // Get invoices issued to customer for a contract
+      response = await Invoice
+        .query()
+        .where("issued_to", id)
+        .where("contract_id", contract_id! as string)
         .withGraphFetched({
           contract: true,
           payment: true
@@ -35,7 +44,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
       response = await Invoice
         .query()
         .where("issued_by", id)
-        .where("contract_id", contract_id!.toString())
+        .where("contract_id", contract_id! as string)
         .withGraphFetched({
           contract: true,
           creator: true,
