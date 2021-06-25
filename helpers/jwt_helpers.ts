@@ -68,7 +68,7 @@ export const generateRefreshToken = (userId: Number, response: Response): Promis
       response.cookie('refreshToken', token,  {
         maxAge: 259200000,
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === "production",
         sameSite: 'none',
         path: '/'
       });
