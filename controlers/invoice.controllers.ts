@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
 import { RequestWithPayload } from "../common/interfaces";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { Invoice } from "../models";
+import { Invoice, User } from "../models";
 import { invoiceSchema } from "../schemas";
 
 const router = Router();
@@ -12,22 +12,30 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
     const { id } = req.payload;
     const { contract_id } = req.query;
     let response;
+    const user = await User
+      .query()
+      .findById(id)
+      .withGraphFetched({
+        mover: true,
+        customer: true,
+      });
 
-    if (!contract_id) {
+    if (user.customer) {
       // Get invoices/bills issued to customer
       response = await Invoice
         .query()
         .where("issued_to", id)
+        .where("contract_id", contract_id!.toString())
         .withGraphFetched({
           contract: true,
           payment: true
         });
     } else {
-      // Get invoises issued by mover
+      // Get invoices issued by mover
       response = await Invoice
         .query()
         .where("issued_by", id)
-        .where("contract_id", contract_id.toString())
+        .where("contract_id", contract_id!.toString())
         .withGraphFetched({
           contract: true,
           creator: true,
