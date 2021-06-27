@@ -1,16 +1,15 @@
 import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
-import { RequestWithPayload } from "../common/interfaces";
-import { verifyToken } from "../helpers/jwt_helpers";
 import { Invoice, User } from "../models";
 import { invoiceSchema } from "../schemas";
+import { verifyToken } from "../helpers/jwt_helpers";
+import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
 
 router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
     const { id } = req.payload;
-    const { contract_id } = req.query;
     let response;
     const user = await User
       .query()
@@ -20,21 +19,11 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         customer: true,
       });
 
-    if (user.customer && !contract_id) {
+    if (user.customer) {
       // Get bills issued to customer
       response = await Invoice
         .query()
         .where("issued_to", id)
-        .withGraphFetched({
-          contract: true,
-          payment: true
-        });
-    } else if (user.customer) {
-      // Get invoices issued to customer for a contract
-      response = await Invoice
-        .query()
-        .where("issued_to", id)
-        .where("contract_id", contract_id! as string)
         .withGraphFetched({
           contract: true,
           payment: true
@@ -44,7 +33,6 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
       response = await Invoice
         .query()
         .where("issued_by", id)
-        .where("contract_id", contract_id! as string)
         .withGraphFetched({
           contract: true,
           creator: true,
