@@ -16,8 +16,6 @@ export const PROPOSAL_STATUS = {
 
 export const CONTRACT_STATUS = {
   DRAFT: 'draft',
-  SENT: 'sent for approval',
-  NEGOTIATE: 'negotiate',
   DECLINED: 'contract declined',
   ACCEPTED: 'contract accepted',
   CLOSED: 'contract closed',
