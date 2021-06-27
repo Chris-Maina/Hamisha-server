@@ -40,8 +40,6 @@ export const contractSchema = Joi.object({
   proposal_id: Joi.number().optional(),
   status: Joi.string().optional().valid(
     CONTRACT_STATUS.DRAFT,
-    CONTRACT_STATUS.SENT,
-    CONTRACT_STATUS.NEGOTIATE,
     CONTRACT_STATUS.DECLINED,
     CONTRACT_STATUS.ACCEPTED,
     CONTRACT_STATUS.CLOSED,
