@@ -8,7 +8,7 @@ import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
 const contractFields: string[] = [
-  'id', 'payment_amount', 'start_time', 'payment_type', 'title', 'status'
+  'id', 'start_time', 'title', 'status'
 ];
 
 const updateProposalFromContract = async (contract: any) => {
@@ -41,6 +41,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         customer: true,
       });
     let response = null;
+
     if (user.customer) {
       response = await Contract
         .query()
@@ -50,7 +51,9 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
           mover: {
             account: true
           },
-          contract_type: true
+          proposal: {
+            job_type: true
+          },
         });
     } else {
       response = await Contract
@@ -62,7 +65,9 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
           customer: {
             account: true
           },
-          contract_type: true
+          proposal: {
+            job_type: true
+          },
         });;
     }
 
@@ -96,7 +101,9 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         mover: {
           account: true
         },
-        contract_type: true
+        proposal: {
+          job_type: true
+        },
       });
   
     res.status(200);
@@ -121,7 +128,9 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
         mover: {
           account: true
         },
-        contract_type: true
+        proposal: {
+          job_type: true
+        },
       });
 
     updateProposalFromContract(response);
@@ -147,7 +156,9 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         mover: {
           account: true
         },
-        contract_type: true
+        proposal: {
+          job_type: true
+        },
       });
 
     updateProposalFromContract(response);
@@ -184,7 +195,9 @@ router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         customer: {
           account: true
         },
-        contract_type: true
+        proposal: {
+          job_type: true
+        },
       });
 
     res.status(200);

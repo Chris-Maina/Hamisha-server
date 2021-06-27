@@ -29,19 +29,10 @@ class Contract extends Model {
           to: "movers.id"
         }
       },
-      contract_type: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: PaymentType,
-        filter: (query: any) => query.select('id', 'name'),
-        join: {
-          from: "contracts.payment_type",
-          to: "payment_types.id"
-        },
-      },
       proposal: {
         relation: Model.BelongsToOneRelation,
         modelClass: Proposal,
-        filter: (query: any) => query.select('id', 'customer_comment', 'mover_comment'),
+        filter: (query: any) => query.select('id', 'customer_comment', 'movers_comment', 'payment_amount', 'payment_type'),
         join: {
           from: "contracts.proposal_id",
           to: "proposals.id"
