@@ -15,6 +15,7 @@ class User extends Model {
   customer!: Customer
   mover!: Mover
   rooms!: Room[]
+  phone_number!: string
 
   static get tableName() {
     return 'users'

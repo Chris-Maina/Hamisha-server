@@ -24,7 +24,7 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
     const response = await User
       .query()
       .findById(id)
-      .select('id', 'first_name', 'last_name', 'email', 'location')
+      .select('id', 'first_name', 'last_name', 'email', 'location', 'phone_number')
       .withGraphFetched({
         customer: true,
         mover: true,
@@ -44,7 +44,7 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
       .query()
       .patch(req.body)
       .where('id', id)
-      .returning(['id', 'email', 'first_name', 'last_name', 'location'])
+      .returning(['id', 'email', 'first_name', 'last_name', 'location', 'phone_number'])
       .withGraphFetched({
         customer: true,
         mover: true,

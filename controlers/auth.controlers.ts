@@ -17,7 +17,16 @@ const router = Router();
 router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await registerSchema.validateAsync(req.body);
-    const { email, password, first_name, last_name, type, location, description } = result;
+    const {
+      email,
+      password,
+      first_name,
+      last_name,
+      type,
+      location,
+      description,
+      phone_number
+    } = result;
 
     const userExists = await User.query().findOne({ email });
     if (userExists) throw new createHttpError.Conflict(`${email} has already been taken`);
@@ -26,13 +35,14 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
     const response = await User
       .query()
       .returning(
-        ['id', 'first_name', 'last_name', 'email',   'location']
+        ['id', 'first_name', 'last_name', 'email', 'location', 'phone_number']
       )
       .insert({
         email,
         last_name,
         first_name,
         location,
+        phone_number,
         password: hashedPassword
       });
 
@@ -101,6 +111,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       mover: user.mover,
       rooms: user.rooms,
       access_token: token,
+      phone_number: user.phone_number,
     });
   } catch (error) {
     if (error.isJoi) return next(new createHttpError.BadRequest('Provide a valid email/password.'));
@@ -164,7 +175,7 @@ router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Respons
     const response = await User
       .query()
       .findById(id)
-      .select('id', 'first_name', 'last_name', 'email')
+      .select('id', 'first_name', 'last_name', 'email', 'phone_number')
       .withGraphFetched({
         customer: true,
         mover: true
