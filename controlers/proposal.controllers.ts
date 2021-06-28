@@ -74,10 +74,17 @@ router.patch("/:id", verifyToken, async (req: Request, res: Response, next: Next
       .query()
       .patch(req.body)
       .where("id", id)
-      .returning(['id', 'status', 'payment_amount', 'created_at']);
+      .returning(['id', 'status', 'payment_amount', 'created_at', 'mover_id', 'payment_type'])
+      .first()
+      .withGraphFetched({
+        mover: {
+          account: true,
+        },
+        job_type: true
+      });
 
     res.status(200);
-    res.send(response[0]);
+    res.send(response);
   } catch (error) {
     next(error);
   }
