@@ -25,7 +25,9 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         .query()
         .where("issued_to", id)
         .withGraphFetched({
-          contract: true,
+          contract: {
+            proposal: true
+          },
           payment: true
         });
     } else {
@@ -34,7 +36,9 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         .query()
         .where("issued_by", id)
         .withGraphFetched({
-          contract: true,
+          contract: {
+            proposal: true
+          },
           creator: true,
           recipient: true,
         });
@@ -57,7 +61,9 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       .insert(result)
       .returning(['id', 'created_at', 'description'])
       .withGraphFetched({
-        contract: true,
+        contract: {
+          proposal: true
+        },
         creator: true,
         recipient: true,
       });

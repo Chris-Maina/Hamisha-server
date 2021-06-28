@@ -40,7 +40,7 @@ class Invoice extends Model {
       contract: {
         relation: Model.BelongsToOneRelation,
         modelClass: Contract,
-        filter: (query: any) => query.select('id', 'payment_amount', 'title'),
+        filter: (query: any) => query.select('id', 'title'),
         join: {
           from: "invoices.contract_id",
           to: "contracts.id"
