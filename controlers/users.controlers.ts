@@ -9,7 +9,7 @@ router.get('/users', async (_req: Request, res: Response, next: NextFunction) =>
   try {
     const response = await User
       .query()
-      .select('id', 'first_name', 'last_name', 'email', 'location');
+      .select('id', 'first_name', 'last_name', 'email', 'phone_number');
 
     res.status(200);
     res.send(response)
@@ -24,7 +24,7 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
     const response = await User
       .query()
       .findById(id)
-      .select('id', 'first_name', 'last_name', 'email', 'location', 'phone_number')
+      .select('id', 'first_name', 'last_name', 'email', 'phone_number')
       .withGraphFetched({
         customer: true,
         mover: true,
@@ -44,7 +44,7 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
       .query()
       .patch(req.body)
       .where('id', id)
-      .returning(['id', 'email', 'first_name', 'last_name', 'location', 'phone_number'])
+      .returning(['id', 'email', 'first_name', 'last_name', 'phone_number'])
       .withGraphFetched({
         customer: true,
         mover: true,

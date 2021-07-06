@@ -11,7 +11,6 @@ class User extends Model {
   first_name!: string
   last_name!: string
   password!: string
-  location!: string
   customer!: Customer
   mover!: Mover
   rooms!: Room[]

@@ -23,7 +23,6 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       first_name,
       last_name,
       type,
-      location,
       description,
       phone_number
     } = result;
@@ -35,13 +34,12 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
     const response = await User
       .query()
       .returning(
-        ['id', 'first_name', 'last_name', 'email', 'location', 'phone_number']
+        ['id', 'first_name', 'last_name', 'email', 'phone_number']
       )
       .insert({
         email,
         last_name,
         first_name,
-        location,
         phone_number,
         password: hashedPassword
       });
@@ -64,8 +62,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       id: response.id,
       email: response.email,
       last_name: response.last_name,
-      first_name: response.first_name,
-      location: response.location
+      first_name: response.first_name
     });
   } catch (error) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
