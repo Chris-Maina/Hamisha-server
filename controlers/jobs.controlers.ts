@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { Router, Request, Response, NextFunction } from 'express';
 
-import { Job } from '../models';
+import { Customer, Job } from '../models';
 import { jobSchema } from '../schemas';
 import { verifyToken } from '../helpers/jwt_helpers';
 import { RequestWithPayload } from '../common/interfaces';
@@ -12,10 +12,7 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
   try {
     const { id } = req.payload;
 
-    const result = await jobSchema.validateAsync({
-      ...req.body,
-      customer_id: id
-    });
+    const result = await jobSchema.validateAsync(req.body);
 
     const {
       title,
@@ -23,14 +20,16 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
       payment_amount,
       expected_duration,
       payment_type,
-      customer_id
     } = result;
+
+    const customer = await Customer.query().findOne({ user_id: id });
+    if (!customer) throw new createHttpError.NotFound('Register as a customer to create jobs');
 
     const response = await Job.query()
       .insert({
         title,
         description,
-        customer_id,
+        customer_id: customer.id,
         payment_type,
         payment_amount,
         expected_duration,
@@ -75,7 +74,9 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       .findById(id)
       .withGraphFetched({
         job_type: true,
-        posted_by: true,
+        customer: {
+          account: true,
+        },
         proposals: {
           mover: {
             account: true,
