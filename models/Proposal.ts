@@ -1,4 +1,5 @@
 import { Model } from "objection";
+import Job from "./Job";
 import Mover from "./Mover";
 import PaymentType from "./PaymentType";
 
@@ -37,6 +38,15 @@ class Proposal extends Model {
           to: 'payment_types.id'
         }
       },
+      job: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Job,
+        filter: (query: any) => query.select('id', 'title'),
+        join: {
+          from: "proposals.job_id",
+          to: "jobs.id"
+        }
+      }
     }
   }
 }
