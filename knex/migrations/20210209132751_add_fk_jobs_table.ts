@@ -11,7 +11,9 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.table('jobs', tbl => {
+    tbl.dropForeign(["customer_id"]);
     tbl.dropColumn('customer_id');
+    tbl.dropForeign(["payment_type"]);
     tbl.dropColumn('payment_type');
   });
 }

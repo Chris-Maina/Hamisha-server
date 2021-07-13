@@ -11,7 +11,10 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.table('messages', tbl => {
+    tbl.dropForeign(["customer_id"]);
     tbl.dropColumn('customer_id');
+
+    tbl.dropForeign(["mover_id"]);
     tbl.dropColumn('mover_id');
   });
 }
