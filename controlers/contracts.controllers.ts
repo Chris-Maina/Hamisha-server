@@ -8,7 +8,7 @@ import { RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
 const contractFields: string[] = [
-  'id', 'start_time', 'title', 'status'
+  'id', 'start_time', 'title', 'status', 'proposal_id', 'mover_id'
 ];
 
 const updateProposalFromContract = async (contract: any) => {
@@ -106,7 +106,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         },
       });
   
-    res.status(200);
+    res.status(201);
     res.send(response);
   } catch (error) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
