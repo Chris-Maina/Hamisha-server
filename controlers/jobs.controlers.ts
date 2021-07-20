@@ -81,7 +81,8 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
           mover: {
             account: true,
           },
-          job_type: true
+          job_type: true,
+          contract: true
         },
       });
     res.status(200);
