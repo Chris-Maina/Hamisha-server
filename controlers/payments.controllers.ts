@@ -81,7 +81,10 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         }
       }
       const invoice = await Invoice.query().findById(payload.invoice_id);
-      const user = await User.query().where('role', USER_TYPES.ADMIN);
+      const user = await User
+        .query()
+        .where('role', USER_TYPES.ADMIN)
+        .first();
       const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
 
       const newInvoice = await Invoice
