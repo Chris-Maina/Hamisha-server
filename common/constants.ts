@@ -1,6 +1,7 @@
 export const USER_TYPES = {
   CUSTOMER: 'customer',
-  MOVER: 'mover'
+  MOVER: 'mover',
+  ADMIN: 'admin'
 }
 
 export const PROPOSAL_STATUS = {
@@ -32,3 +33,11 @@ export const FETCH_USER_MESSAGES = 'events/FETCH_USER_MESSAGES';
 export const LOAD_MESSAGES_IN_ROOM = 'events/LOAD_MESSAGES_IN_ROOM';
 export const FETCH_MESSAGES_FROM_ROOM = 'events/FETCH_MESSAGES_FROM_ROOM';
 export const FETCH_USER_ROOMS_RESPONSE = 'events/FETCH_USER_ROOMS_RESPONSE';
+
+// Commission is 4%
+export const COMMISSION = 0.04;
+
+export const MPESA_API = {
+  LipaNaMpesa: "LIPA NA M-PESA ONLINE",
+  B2C: "Business To Client"
+}

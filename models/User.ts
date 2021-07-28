@@ -15,6 +15,7 @@ class User extends Model {
   mover!: Mover
   rooms!: Room[]
   phone_number!: string
+  role!: string
 
   static get tableName() {
     return 'users'
