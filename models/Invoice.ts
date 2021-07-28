@@ -11,6 +11,7 @@ class Invoice extends Model {
   description!: string
   issued_by!: number
   issued_to!: number
+  total!: number
 
   static get tableName() {
     return "invoices";
