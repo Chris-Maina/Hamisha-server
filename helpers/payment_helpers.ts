@@ -1,4 +1,11 @@
-import { request } from "https"
+import { request } from "https";
+import { 
+  publicEncrypt,
+  constants,
+  createPublicKey,
+
+ } from "crypto";
+import { readFileSync } from "fs";
 
 export interface MpesaToken {
   access_token: string,
@@ -123,3 +130,38 @@ const formatMpesaValues = (key: string, value: any) => {
       return value;
   }
 }
+
+export const getSecurityCredentials = (): string => {
+  // Create a public key from cer file
+  const file = readFileSync("../security/SandboxCertificate.cer");
+
+  const publicKey = createPublicKey(file).export({ type: 'pkcs1', format: 'pem' })
+  console.log("publicKey", publicKey)
+  // encode password with base64
+  const base64Buffer = Buffer.from(process.env.MPESA_INITIATOR_PWD!, "base64");
+
+  return publicEncrypt(
+    {
+      key: publicKey,
+      padding: constants.RSA_PKCS1_PADDING,
+    },
+    base64Buffer
+  ).toString('base64');
+}
+
+export const urlWithParams = (url: string, params: any): string => {
+  let paramsStr = '';
+
+  let first = true;
+  Object.keys(params).forEach(key => {
+    paramsStr += first ? '?' : '&';
+    paramsStr += key;
+    paramsStr += '=';
+    paramsStr += encodeURIComponent(String(params[key]));
+
+    first = false;
+  });
+
+  return url + paramsStr;
+}
+
