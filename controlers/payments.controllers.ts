@@ -65,45 +65,46 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
   try {
     const { invoice_id } = req.query;
     // ResultCode of 0 is a success
-    if (req.body.Body.stkCallback.ResultCode === 0) {
-      // Create a payment record
-      const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
-      payload['invoice_id'] = parseInt(invoice_id as string, 10);
-      await Payment.query().insert(payload);
+    if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
 
-      // make request to send to recipitent
-      const options = {
-        host: "hamisha-api.herokuapp.com",
-        path: "/api/payments/sendtorecipient",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        }
+    // Create a payment record
+    const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
+    payload['invoice_id'] = parseInt(invoice_id as string, 10);
+    await Payment.query().insert(payload);
+
+    // make request to send to recipitent
+    const options = {
+      host: "hamisha-api.herokuapp.com",
+      path: "/api/payments/sendtorecipient",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       }
-      const invoice = await Invoice.query().findById(payload.invoice_id);
-      const user = await User
-        .query()
-        .where('role', USER_TYPES.ADMIN)
-        .first();
-      const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
-
-      const newInvoice = await Invoice
-        .query()
-        .insert({
-          issued_by: user.id,
-          issued_to: invoice.issued_to,
-          contract_id: invoice.contract_id,
-          total: amountToSend,
-          description: "Payment from hamisha"
-        });
-
-      const postPayload = {
-        invoice_id: newInvoice.id,
-        amount: amountToSend,
-        recipient_phone_number: user.phone_number
-      }
-      makeApiRequest(options, postPayload)
     }
+    const invoice = await Invoice.query().findById(payload.invoice_id);
+    const user = await User
+      .query()
+      .where('role', USER_TYPES.ADMIN)
+      .first();
+    const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
+
+    const newInvoice = await Invoice
+      .query()
+      .insert({
+        issued_by: user.id,
+        issued_to: invoice.issued_to,
+        contract_id: invoice.contract_id,
+        total: amountToSend,
+        description: "Payment from hamisha"
+      });
+
+    const postPayload = {
+      invoice_id: newInvoice.id,
+      amount: amountToSend,
+      recipient_phone_number: user.phone_number
+    }
+    makeApiRequest(options, postPayload)
+    
     // respond to safaricom servers with a success message
     res.json({
       "ResponseCode": "00000000",
