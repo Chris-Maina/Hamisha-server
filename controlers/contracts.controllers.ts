@@ -59,7 +59,6 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
       response = await Contract
         .query()
         .where('mover_id', user.mover.id)
-        .where('status', '!=', CONTRACT_STATUS.DRAFT) // != and <> both mean not equal
         .orderBy('created_at', 'desc')
         .withGraphFetched({
           customer: {
