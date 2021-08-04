@@ -8,6 +8,7 @@ import { verifyToken } from "../helpers/jwt_helpers";
 import { PROPOSAL_STATUS } from "../common/constants";
 
 const router = Router();
+const PROPOSAL_FIELDS = ['id', 'status', 'payment_amount', 'created_at', 'mover_id', 'payment_type'];
 
 router.get('/', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -53,6 +54,13 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         payment_type,
         payment_amount,
         status: PROPOSAL_STATUS.SENT
+      })
+      .returning(PROPOSAL_FIELDS)
+      .withGraphFetched({
+        mover: {
+          account: true,
+        },
+        job_type: true
       });
 
       res.status(201);
@@ -75,7 +83,7 @@ router.patch("/:id", verifyToken, async (req: Request, res: Response, next: Next
       .query()
       .patch(req.body)
       .where("id", id)
-      .returning(['id', 'status', 'payment_amount', 'created_at', 'mover_id', 'payment_type'])
+      .returning(PROPOSAL_FIELDS)
       .first()
       .withGraphFetched({
         mover: {
