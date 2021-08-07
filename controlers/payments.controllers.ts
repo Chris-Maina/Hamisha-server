@@ -66,14 +66,14 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const { invoice_id } = req.query;
     // Check for status of submission
     // ResultCode of 0 is a success
-    console.log("Results >>>>>", req.body.Body.stkCallback.ResultCode, req.body.Body.stkCallback.ResultCode !== 0)
+    console.log("Results >>>>>", req.body.Body.stkCallback.CallbackMetadata.Item)
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
-    console.log("Passed error is below")
+
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
     await Payment.query().insert(payload);
-    console.log("Payment saved")
+
     // make request to send to recipitent
     const options = {
       host: "hamisha-api.herokuapp.com",
@@ -99,7 +99,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         total: amountToSend,
         description: "Payment from hamisha"
       });
-    console.log("About to save payment from hamisha")
+    console.log("Saved payment from hamisha")
     const postPayload = {
       invoice_id: newInvoice.id,
       amount: amountToSend,
