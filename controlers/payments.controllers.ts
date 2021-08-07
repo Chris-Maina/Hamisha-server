@@ -66,7 +66,6 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const { invoice_id } = req.query;
     // Check for status of submission
     // ResultCode of 0 is a success
-    console.log("Results >>>>>", req.body.Body.stkCallback.CallbackMetadata.Item)
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
 
     // Create a payment record
@@ -88,8 +87,9 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       .query()
       .where('role', USER_TYPES.ADMIN)
       .first();
+    console.log("Results >>>>>", payload.amount)
     const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
-
+    console.log("amountToSend >>>>>", typeof amountToSend, amountToSend)
     const newInvoice = await Invoice
       .query()
       .insert({

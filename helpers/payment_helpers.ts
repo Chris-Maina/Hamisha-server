@@ -126,8 +126,6 @@ const formatMpesaValues = (key: string, value: any) => {
       return new Date(value);
     case KEYS['PhoneNumber']:
       return value.toString();
-    case KEYS['Amount']:
-      return Number(value);
     default:
       return value;
   }
