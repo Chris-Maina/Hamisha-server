@@ -66,14 +66,14 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const { invoice_id } = req.query;
     // Check for status of submission
     // ResultCode of 0 is a success
-    console.log("Results >>>>>", typeof req.body.Body.stkCallback.ResultCode, req.body.Body.stkCallback.ResultCode !== 0)
+    console.log("Results >>>>>", req.body.Body.stkCallback.ResultCode, req.body.Body.stkCallback.ResultCode !== 0)
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
-
+    console.log("Passed error is below")
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
     await Payment.query().insert(payload);
-
+    console.log("Payment saved")
     // make request to send to recipitent
     const options = {
       host: "hamisha-api.herokuapp.com",
@@ -99,13 +99,13 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         total: amountToSend,
         description: "Payment from hamisha"
       });
-
+    console.log("About to save payment from hamisha")
     const postPayload = {
       invoice_id: newInvoice.id,
       amount: amountToSend,
       recipient_phone_number: user.phone_number
     }
-    makeApiRequest(options, postPayload)
+    await makeApiRequest(options, postPayload);
     
     // respond to safaricom servers with a success message
     res.json({
@@ -113,6 +113,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       "ResponseDesc": "success"
     });
   } catch (error) {
+    console.log("Error >>>>>>>>>", error)
     next(error);
   }
 });
