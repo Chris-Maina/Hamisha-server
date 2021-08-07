@@ -66,7 +66,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const { invoice_id } = req.query;
     // Check for status of submission
     // ResultCode of 0 is a success
-    console.log("Results >>>>>", req.body)
+    console.log("Results >>>>>", typeof req.body.Body.stkCallback.ResultCode, req.body.Body.stkCallback.ResultCode !== 0)
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
 
     // Create a payment record
