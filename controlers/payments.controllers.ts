@@ -64,8 +64,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id } = req.query;
-    // Check for status of submission
-    // ResultCode of 0 is a success
+    // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
 
     // Create a payment record
@@ -87,9 +86,9 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       .query()
       .where('role', USER_TYPES.ADMIN)
       .first();
-    console.log("Results >>>>>", payload.amount)
+
+    // Deduct commission and send the rest
     const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
-    console.log("amountToSend >>>>>", typeof amountToSend, amountToSend)
     const newInvoice = await Invoice
       .query()
       .insert({
@@ -99,7 +98,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         total: amountToSend,
         description: "Payment from hamisha"
       });
-    console.log("Saved payment from hamisha")
+
     const postPayload = {
       invoice_id: newInvoice.id,
       amount: amountToSend,
@@ -113,7 +112,6 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       "ResponseDesc": "success"
     });
   } catch (error) {
-    console.log("Error >>>>>>>>>", error)
     next(error);
   }
 });
@@ -129,8 +127,8 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       SecurityCredential: getSecurityCredentials(),
       CommandID: 'SalaryPayment',
       Amount: amount,
-      PartyA: 600980,//  B2C organization shortcode
-      PartyB: recipient_phone_number,
+      PartyA: 600977,//  B2C organization shortcode
+      PartyB: "254708374149" || recipient_phone_number,
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}`,
     };
     const path = urlWithParams('/mpesa/b2c/v1/paymentrequest', parameters)
@@ -147,6 +145,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
     const response = await makeApiRequest(options);
     console.log("sendtorecipient response >>>>", response);
   } catch (error) {
+    console.log("Error >>>>>>>>>", error)
     next(error);
   }
 });
@@ -159,7 +158,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     console.log("b2c success", req.body);
     /**
      * THOUGHTS
-     * Create a business user who will be making payments
+     * Create a business user who will be making payments. Hamisha admin user
      * Create an invoice from this user to recipient user linked to the contract
      * Add this payment to the Payment table
      */
@@ -175,6 +174,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     //   "ResponseDesc": "success"
     // });
   } catch (error) {
+    console.log("B2C Error >>>>>>>>>", error)
     next(error);
   }
 });
