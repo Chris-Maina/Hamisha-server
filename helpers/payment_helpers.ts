@@ -2,8 +2,6 @@ import { request } from "https";
 import { 
   publicEncrypt,
   constants,
-  createPublicKey,
-
  } from "crypto";
 import { readFileSync } from "fs";
 
@@ -132,11 +130,9 @@ const formatMpesaValues = (key: string, value: any) => {
 }
 
 export const getSecurityCredentials = (): string => {
-  // Create a public key from cer file
-  const file = readFileSync("../security/SandboxCertificate.cer");
+  // Get public key from cer file. Specify file location from root folder
+  const publicKey = readFileSync("security/SandboxCertificate.cer", 'utf-8');
 
-  const publicKey = createPublicKey(file).export({ type: 'pkcs1', format: 'pem' })
-  console.log("publicKey", publicKey)
   // encode password with base64
   const base64Buffer = Buffer.from(process.env.MPESA_INITIATOR_PWD!, "base64");
 
