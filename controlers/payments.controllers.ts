@@ -122,6 +122,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       "ResponseDesc": "success"
     });
   } catch (error) {
+    console.log("lipa na mpesa error", error)
     next(error);
   }
 });
@@ -130,6 +131,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
   try {
     const { invoice_id, amount, sender_phone_number, recipient_phone_number } = req.body;
     const token = await getMpesaAuthToken();
+    const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
 
     // Send MPESA request to pay recipient
     const parameters = {
@@ -137,8 +139,9 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       SecurityCredential: getSecurityCredentials(),
       CommandID: 'SalaryPayment',
       Amount: amount,
-      PartyA: 600977,//  B2C organization shortcode
+      PartyA: 600992 || BUSINESS_SHORT_CODE,//  B2C organization shortcode
       PartyB: "254708374149" || recipient_phone_number,
+      QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
     };
     const path = urlWithParams('/mpesa/b2c/v1/paymentrequest', parameters)
