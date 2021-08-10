@@ -101,11 +101,11 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const newInvoice = await Invoice
       .query()
       .insert({
-        issued_by: adminUser.id,
-        issued_to: invoice.issued_to,
+        issued_by: invoice.issued_to,
+        issued_to: adminUser.id,
         contract_id: invoice.contract_id,
         total: amountToSend,
-        description: "Payment from hamisha"
+        description: `Pay ${recipientUser.first_name} ksh ${amountToSend}`
       });
 
     const postPayload = {
