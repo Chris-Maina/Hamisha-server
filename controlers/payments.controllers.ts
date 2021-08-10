@@ -82,17 +82,26 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       }
     }
     const invoice = await Invoice.query().findById(payload.invoice_id);
-    const user = await User
+    const users = await User
       .query()
       .where('role', USER_TYPES.ADMIN)
-      .first();
+      .orWhere('id', invoice.issued_to);
+
+    const { adminUser, recipientUser } = users.reduce((acc: any, user: User) => {
+      if (user.role === USER_TYPES.ADMIN) {
+        acc['adminUser'] = user;
+      } else if (user.id === invoice.issued_to) {
+        acc['recipientUser'] = user;
+      }
+      return acc;
+    }, { adminUser: undefined, recipientUser: undefined })
 
     // Deduct commission and send the rest
     const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
     const newInvoice = await Invoice
       .query()
       .insert({
-        issued_by: user.id,
+        issued_by: adminUser.id,
         issued_to: invoice.issued_to,
         contract_id: invoice.contract_id,
         total: amountToSend,
@@ -102,7 +111,8 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const postPayload = {
       invoice_id: newInvoice.id,
       amount: amountToSend,
-      recipient_phone_number: user.phone_number
+      sender_phone_number: adminUser.phone_number,
+      recipient_phone_number: recipientUser.phone_number
     }
     await makeApiRequest(options, postPayload);
     
@@ -118,7 +128,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
 router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { invoice_id, amount, recipient_phone_number } = req.body;
+    const { invoice_id, amount, sender_phone_number, recipient_phone_number } = req.body;
     const token = await getMpesaAuthToken();
 
     // Send MPESA request to pay recipient
@@ -129,7 +139,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       Amount: amount,
       PartyA: 600977,//  B2C organization shortcode
       PartyB: "254708374149" || recipient_phone_number,
-      ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}`,
+      ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
     };
     const path = urlWithParams('/mpesa/b2c/v1/paymentrequest', parameters)
     const options = {
@@ -153,8 +163,9 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { invoice_id } = req.query;
+    const { invoice_id, sender_phone_number } = req.query;
     console.log("invoice_id", invoice_id);
+    console.log("owner of short code or sender", sender_phone_number)
     console.log("b2c success", req.body);
     /**
      * THOUGHTS
