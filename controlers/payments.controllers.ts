@@ -138,8 +138,8 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
       SecurityCredential: getSecurityCredentials(),
       CommandID: 'SalaryPayment',
-      Amount: amount,
-      PartyA: 600992 || BUSINESS_SHORT_CODE,//  B2C organization shortcode
+      Amount: amount.toString(),
+      PartyA: "600992" || BUSINESS_SHORT_CODE,//  B2C organization shortcode
       PartyB: "254708374149" || recipient_phone_number,
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
@@ -195,7 +195,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 router.post('/b2c/timeout', async (req: Request, res: Response, next: NextFunction) => {
-  
+
 })
 
 export default router;
