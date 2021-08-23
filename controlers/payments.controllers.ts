@@ -141,11 +141,11 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       Amount: amount,
       PartyA: 600992 || BUSINESS_SHORT_CODE,//  B2C organization shortcode
       PartyB: "254708374149" || recipient_phone_number,
-      QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c",
+      QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
     };
     // const path = urlWithParams('/mpesa/b2c/v1/paymentrequest');
-
+    console.log("payload", parameters);
     const options = {
       host: "sandbox.safaricom.co.ke",
       path: "/mpesa/b2c/v1/paymentrequest",
@@ -193,5 +193,9 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 });
+
+router.post('/b2c/timeout', async (req: Request, res: Response, next: NextFunction) => {
+  
+})
 
 export default router;
