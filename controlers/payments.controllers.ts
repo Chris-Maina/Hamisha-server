@@ -137,9 +137,9 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
       SecurityCredential: getSecurityCredentials(),
-      CommandID: 'SalaryPayment',
+      CommandID: "SalaryPayment",
       Amount: amount.toString(),
-      PartyA: "600992" || BUSINESS_SHORT_CODE,//  B2C organization shortcode
+      PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
       PartyB: "254708374149" || recipient_phone_number,
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
