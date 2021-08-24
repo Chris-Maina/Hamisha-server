@@ -131,7 +131,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
   try {
     const { invoice_id, amount, sender_phone_number, recipient_phone_number } = req.body;
     const token = await getMpesaAuthToken();
-    const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
+    const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
 
     // Send MPESA request to pay recipient
     const parameters = {
@@ -144,7 +144,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
     };
-    // const path = urlWithParams('/mpesa/b2c/v1/paymentrequest');
+
     console.log("payload", parameters);
     const options = {
       host: "sandbox.safaricom.co.ke",
