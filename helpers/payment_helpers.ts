@@ -130,19 +130,23 @@ const formatMpesaValues = (key: string, value: any) => {
 }
 
 export const getSecurityCredentials = (): string => {
-  // Get public key from cer file. Specify file location from root folder
-  const publicKey = readFileSync("security/SandboxCertificate.cer", 'utf-8');
+  try {
+    // Get public key from cer file. Specify file location from root folder
+    const publicKey = readFileSync("security/SandboxCertificate.cer", 'utf-8');
 
-  // encode password with base64
-  const base64Buffer = Buffer.from(process.env.MPESA_INITIATOR_PWD!, "base64");
+    // encode password with base64
+    const base64Buffer = Buffer.from(process.env.MPESA_INITIATOR_PWD!, "base64");
 
-  return publicEncrypt(
-    {
-      key: publicKey,
-      padding: constants.RSA_PKCS1_PADDING,
-    },
-    base64Buffer
-  ).toString('base64');
+    return publicEncrypt(
+      {
+        key: publicKey,
+        padding: constants.RSA_PKCS1_PADDING,
+      },
+      base64Buffer
+    ).toString('base64');
+  } catch (error) {
+    throw error;
+  }
 }
 
 export const urlWithParams = (url: string, params: any): string => {
