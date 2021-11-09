@@ -2,6 +2,7 @@ export { default as Job } from './Job';
 export { default as User } from './User';
 export { default as Room } from './Room';
 export { default as Mover } from './Mover';
+export { default as Vehicle } from './Vehicle';
 export { default as Invoice } from './Invoice';
 export { default as Payment } from './Payment';
 export { default as Message } from './Message';
