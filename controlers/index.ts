@@ -8,6 +8,7 @@ import proposalRoutes from './proposal.controllers';
 import contractRoutes from './contracts.controllers';
 import invoiceRoutes from './invoice.controllers';
 import paymentTypeRoutes from './payment_types.controllers';
+import vehicleRoutes from "./vehicles.controller";
 
 const router = Router();
 router.use(authRoutes);
@@ -19,5 +20,6 @@ router.use('/payments', paymentRoutes);
 router.use('/proposals', proposalRoutes);
 router.use('/contracts', contractRoutes);
 router.use('/payment_types', paymentTypeRoutes);
+router.use('/vehicles', vehicleRoutes);
 
 export default router;
