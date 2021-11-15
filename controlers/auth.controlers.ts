@@ -77,7 +77,7 @@ router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Res
           reg_number,
           vehicle_type,
           mover_id: mover.id,
-          vehicle_pic: req.file.path,
+          vehicle_pic: req.file.location,
         });
       }
     }
@@ -195,7 +195,9 @@ router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Respons
       .select('id', 'first_name', 'last_name', 'email', 'phone_number')
       .withGraphFetched({
         customer: true,
-        mover: true
+        mover: {
+          vehicles: true
+        }
       });
 
     res.status(200);
