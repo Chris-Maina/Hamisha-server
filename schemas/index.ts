@@ -12,7 +12,7 @@ export const registerSchema = loginSchema.keys({
   type: Joi.string().required(),
   description: Joi.string().optional().allow(''), // empty strings are not allowed by default and must be enabled with allow('')
   phone_number: Joi.string().optional(),
-  reg_number: Joi.string().optional(),
+  reg_number: Joi.string().uppercase().optional(),
   vehicle_pic: Joi.string().optional().allow(''),
   vehicle_type: Joi.string().optional().allow(''),
 });
