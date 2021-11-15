@@ -100,7 +100,9 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       .findOne({ email })
       .withGraphFetched({
         customer: true,
-        mover: true,
+        mover: {
+          vehicles: true
+        },
         rooms: {
           messages: true,
           participants: {

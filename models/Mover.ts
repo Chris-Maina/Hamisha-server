@@ -1,5 +1,6 @@
 import { Model } from 'objection';
 import User from './User';
+import Vehicle from './Vehicle';
 
 class Mover extends Model {
   id!: number
@@ -21,6 +22,15 @@ class Mover extends Model {
         join: {
           from: 'movers.user_id',
           to: 'users.id'
+        }
+      },
+      vehicles: {
+        relation: Model.HasManyRelation,
+        modelClass: Vehicle,
+        filter: (query: any) => query.select('reg_number', 'vehicle_type', 'vehicle_pic'),
+        join: {
+          from: "movers.id",
+          to: "vehicles.mover_id"
         }
       }
     }
