@@ -1,19 +1,6 @@
 import multer from "multer";
-import path from "path";
-
-/**
- * 
- * @param category - string. Category associated with the image stored 
- * e.g vehicles, profile pics
- * @returns storage configuration
- */
-export const storage = (category: string) => multer.diskStorage({
-  destination: `./public/images/${category}`,
-  // By default, multer removes file extensions so let's add them back
-  filename: function (_req, file, cb) {
-    cb(null, file.fieldname + '_' + Date.now() + path.extname(file.originalname));
-  }
-});
+import multerS3 from "multer-s3";
+import { S3 } from "./s3config";
 
 export const imageFilter = (req: any, file: any, cb: any) => {
   // Accept images only
@@ -24,11 +11,18 @@ export const imageFilter = (req: any, file: any, cb: any) => {
   return cb(null, true);
 }
   
-export const IMAGE_CATEGORIES = {
-  VEHICLES: 'vehicles'
-}
 
 export const upload = multer({
-  storage: storage(IMAGE_CATEGORIES.VEHICLES),
+  storage: multerS3({
+    s3: S3,
+    bucket: process.env.S3_BUCKET_NAME || '',
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      cb(null, file.originalname)
+    }
+  }),
+  limits: { fileSize: 1024 * 1024 * 50 }, // 50MB
   fileFilter: imageFilter,
 });
