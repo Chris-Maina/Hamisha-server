@@ -1,8 +1,10 @@
 
-import { Router, NextFunction, Response } from "express";
+import { Router, NextFunction, Response, Request } from "express";
 import createHttpError from "http-errors";
+import type { Readable } from 'stream';
 import { upload } from "../multer";
 import Vehicle from "../models/Vehicle";
+import { getFileStream } from "../s3config";
 
 const router = Router();
 
@@ -66,5 +68,16 @@ router.patch('/', upload.single('vehicle_pic'), async (req: any, res: Response, 
     next(error)
   }
 });
+
+router.get('/:key', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.params.key) throw new createHttpError.BadRequest("Please provide the vehicle_pic");
+    const readStream: Readable = getFileStream(req.params.key);
+
+    readStream.pipe(res);
+  } catch (error) {
+    next(error);
+  }
+})
 
 export default router;
