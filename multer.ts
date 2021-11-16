@@ -1,8 +1,14 @@
 import multer from "multer";
-import multerS3 from "multer-s3";
-import { S3 } from "./s3config";
 
-export const imageFilter = (req: any, file: any, cb: any) => {
+const storage = multer.diskStorage({
+  destination: './public/images',
+  filename: function (_req, file, cb) {
+    const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '_' + uniqueSuffix);
+  }
+});
+
+export const imageFilter = (req: any, file: Express.Multer.File, cb: any) => {
   // Accept images only
   if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
     req.fileValidationError = 'Only image files are allowed!';
@@ -13,16 +19,7 @@ export const imageFilter = (req: any, file: any, cb: any) => {
   
 
 export const upload = multer({
-  storage: multerS3({
-    s3: S3,
-    bucket: process.env.S3_BUCKET_NAME || '',
-    metadata: function (req, file, cb) {
-      cb(null, { fieldName: file.fieldname });
-    },
-    key: function (req, file, cb) {
-      cb(null, file.originalname)
-    }
-  }),
+  storage,
   limits: { fileSize: 1024 * 1024 * 50 }, // 50MB
   fileFilter: imageFilter,
 });
