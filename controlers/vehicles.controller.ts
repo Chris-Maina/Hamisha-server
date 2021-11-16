@@ -6,6 +6,7 @@ import { upload } from "../multer";
 import Vehicle from "../models/Vehicle";
 import { getFileStream, uploadFile } from "../s3config";
 import { S3UploadedObject } from "../common/interfaces";
+import { unlinkFile } from "../helpers/unlinkFileHelper";
 
 const router = Router();
 
@@ -24,6 +25,9 @@ router.post('/', upload.single('vehicle_pic'), async (req: any, res: Response, n
   
       // upload file
       const uploadedFile: S3UploadedObject = await uploadFile(req.file);
+
+      // unlink file
+      unlinkFile(req.file.path);
       // save file path in DB
       const response = await Vehicle.query().insert({
         mover_id: parseInt(mover_id, 10),

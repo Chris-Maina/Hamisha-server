@@ -13,6 +13,7 @@ import {
 } from '../helpers/jwt_helpers';
 import { upload } from "../multer";
 import { uploadFile } from '../s3config';
+import { unlinkFile } from '../helpers/unlinkFileHelper';
 
 const router = Router();
 
@@ -75,6 +76,8 @@ router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Res
 
         // Upload file
         const uploadedFile: S3UploadedObject = await uploadFile(req.file);
+        // Unlike file 
+        unlinkFile(req.file.path);
         // add to vehicles table
         await Vehicle.query().insert({
           reg_number,
