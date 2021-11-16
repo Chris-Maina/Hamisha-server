@@ -4,7 +4,8 @@ import createHttpError from "http-errors";
 import type { Readable } from 'stream';
 import { upload } from "../multer";
 import Vehicle from "../models/Vehicle";
-import { getFileStream } from "../s3config";
+import { getFileStream, uploadFile } from "../s3config";
+import { S3UploadedObject } from "../common/interfaces";
 
 const router = Router();
 
@@ -16,22 +17,23 @@ router.post('/', upload.single('vehicle_pic'), async (req: any, res: Response, n
     } else if (!req.file) {
       throw new createHttpError.BadRequest("Please select an image to upload");
     } else {
-      const { reg_number, vehicle_type } = req.fields;
-      const { mover_id } = req.body;
+      const { mover_id, reg_number, vehicle_type } = req.body;
 
       const vehicleExists = await Vehicle.query().findOne({ reg_number });
       if (vehicleExists) throw new createHttpError.Conflict(`Vehicle with ${reg_number} has already been registered`);
   
+      // upload file
+      const uploadedFile: S3UploadedObject = await uploadFile(req.file);
       // save file path in DB
       const response = await Vehicle.query().insert({
-        mover_id,
+        mover_id: parseInt(mover_id, 10),
         reg_number,
         vehicle_type,
-        vehicle_pic: req.file.path,
+        vehicle_pic: uploadedFile.Key,
       });
 
       res.status(201);
-      return res.send({ message: `Successfully uploaded vehicle ${response} picture` });
+      return res.send(response);
     }
   } catch (error) {
     next(error)

@@ -4,7 +4,7 @@ import { Response, Router, Request, NextFunction } from 'express';
 import { USER_TYPES } from '../common/constants';
 import { User, Mover, Customer, Vehicle } from '../models';
 import { registerSchema, loginSchema } from '../schemas';
-import { RequestWithPayload } from '../common/interfaces';
+import { RequestWithPayload, S3UploadedObject } from '../common/interfaces';
 import {
   verifyToken,
   generateToken,
@@ -12,6 +12,7 @@ import {
   generateRefreshToken,
 } from '../helpers/jwt_helpers';
 import { upload } from "../multer";
+import { uploadFile } from '../s3config';
 
 const router = Router();
 
@@ -72,12 +73,14 @@ router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Res
         const vehicleExists = await Vehicle.query().findOne({ reg_number });
         if (vehicleExists) throw new createHttpError.Conflict(`Vehicle with ${reg_number} has already been registered`);
 
+        // Upload file
+        const uploadedFile: S3UploadedObject = await uploadFile(req.file);
         // add to vehicles table
         await Vehicle.query().insert({
           reg_number,
           vehicle_type,
           mover_id: mover.id,
-          vehicle_pic: req.file.location,
+          vehicle_pic: uploadedFile.Key,
         });
       }
     }
