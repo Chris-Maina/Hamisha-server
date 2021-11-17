@@ -194,6 +194,7 @@ router.post('/reset-password', async (req: Request, res: Response, next: NextFun
   }
 });
 
+// Gets logged in user resource
 router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
     const { id } = req.payload;
