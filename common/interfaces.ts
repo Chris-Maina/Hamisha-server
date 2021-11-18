@@ -17,3 +17,10 @@ export interface ProposalAttr {
   customer_comment?: string,
   movers_comment?: string,
 }
+
+export type S3UploadedObject = {
+  Location: string,
+  ETag: string,
+  Bucket: string,
+  Key: string
+}

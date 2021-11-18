@@ -7,11 +7,18 @@ export const loginSchema = Joi.object({
 });
 
 export const registerSchema = loginSchema.keys({
-  first_name: Joi.string().required(),
-  last_name: Joi.string().required(),
+  first_name: Joi.string().optional().allow(''),
+  last_name: Joi.string().optional().allow(''),
   type: Joi.string().required(),
+  phone_number: Joi.string().optional(),
+}).unknown();
+
+
+export const moverRegisterSchema = registerSchema.keys({
   description: Joi.string().optional().allow(''), // empty strings are not allowed by default and must be enabled with allow('')
-  phone_number: Joi.string().optional()
+  reg_number: Joi.string().uppercase().optional(),
+  vehicle_pic: Joi.string().optional().allow(''),
+  vehicle_type: Joi.string().optional().allow(''),
 });
 
 export const proposalSchema = Joi.object({

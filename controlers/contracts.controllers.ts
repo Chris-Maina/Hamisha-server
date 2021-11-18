@@ -107,7 +107,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
   
     res.status(201);
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }

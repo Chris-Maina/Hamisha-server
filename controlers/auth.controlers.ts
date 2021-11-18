@@ -2,21 +2,27 @@ import createHttpError from 'http-errors';
 import { Response, Router, Request, NextFunction } from 'express';
 
 import { USER_TYPES } from '../common/constants';
-import { User, Mover, Customer } from '../models';
-import { registerSchema, loginSchema } from '../schemas';
-import { RequestWithPayload } from '../common/interfaces';
+import { User, Mover, Customer, Vehicle } from '../models';
+import { registerSchema, loginSchema, moverRegisterSchema } from '../schemas';
+import { RequestWithPayload, S3UploadedObject } from '../common/interfaces';
 import {
   verifyToken,
   generateToken,
   verifyRefreshToken,
   generateRefreshToken,
 } from '../helpers/jwt_helpers';
+import { upload } from "../multer";
+import { uploadFile } from '../s3config';
+import { unlinkFile } from '../helpers/unlinkFileHelper';
 
 const router = Router();
 
-router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Response, next: NextFunction) => {
   try {
-    const result = await registerSchema.validateAsync(req.body);
+    const result = req.body.type === USER_TYPES.CUSTOMER ? 
+      await registerSchema.validateAsync(req.body) 
+    : await moverRegisterSchema.validateAsync(req.body);
+    
     const {
       email,
       password,
@@ -24,7 +30,9 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       last_name,
       type,
       description,
-      phone_number
+      phone_number,
+      reg_number,
+      vehicle_type
     } = result;
 
     const userExists = await User.query().findOne({ email });
@@ -45,6 +53,13 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         password: hashedPassword
       });
 
+    const userObj: {[key: string]: any} = {
+      id: response.id,
+      email: response.email,
+      last_name: response.last_name,
+      first_name: response.first_name,
+    };
+
     if (type === USER_TYPES.CUSTOMER) {
       // add to customers table
       await Customer.query().insert({
@@ -52,20 +67,33 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
       })
     } else {
       // add to movers table
-      await Mover.query().insert({
+      const mover = await Mover.query().insert({
         user_id: response.id,
         description
-      })
+      });
+
+      userObj['mover_id'] = mover.id;
+      if (reg_number && req.file) {
+        const vehicleExists = await Vehicle.query().findOne({ reg_number });
+        if (vehicleExists) throw new createHttpError.Conflict(`Vehicle with ${reg_number} has already been registered`);
+
+        // Upload file
+        const uploadedFile: S3UploadedObject = await uploadFile(req.file);
+        // Unlike file 
+        unlinkFile(req.file.path);
+        // add to vehicles table
+        await Vehicle.query().insert({
+          reg_number,
+          vehicle_type,
+          mover_id: mover.id,
+          vehicle_pic: uploadedFile.Key,
+        });
+      }
     }
 
     res.status(201);
-    res.send({
-      id: response.id,
-      email: response.email,
-      last_name: response.last_name,
-      first_name: response.first_name
-    });
-  } catch (error) {
+    res.send(userObj);
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
@@ -81,7 +109,9 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       .findOne({ email })
       .withGraphFetched({
         customer: true,
-        mover: true,
+        mover: {
+          vehicles: true
+        },
         rooms: {
           messages: true,
           participants: {
@@ -111,7 +141,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       access_token: token,
       phone_number: user.phone_number,
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest('Provide a valid email/password.'));
     next(error);
   }
@@ -161,12 +191,13 @@ router.post('/reset-password', async (req: Request, res: Response, next: NextFun
       access_token: token,
       refresh_token: newRefreshToken
     })
-  } catch (error) {
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest('Provide a valid email/password.'));
     next(error);
   }
 });
 
+// Gets logged in user resource
 router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
     const { id } = req.payload;
@@ -176,7 +207,9 @@ router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Respons
       .select('id', 'first_name', 'last_name', 'email', 'phone_number')
       .withGraphFetched({
         customer: true,
-        mover: true
+        mover: {
+          vehicles: true
+        }
       });
 
     res.status(200);

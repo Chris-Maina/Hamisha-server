@@ -26,6 +26,8 @@ app.use(morgan('dev'));
 app.use(express.json());
 // Parse form data
 app.use(express.urlencoded({ extended: false }));
+// Serve static files such as images
+app.use(express.static(__dirname + '/public'));
 
 /* Endpoints */
 app.use('/api', routes);

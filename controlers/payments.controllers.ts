@@ -64,13 +64,16 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id } = req.query;
+    console.log("Response from mpesa", req.body)
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
 
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
+    console.log("Saving payment ....")
     await Payment.query().insert(payload);
+    console.log("Done")
 
     // make request to send to recipitent
     const options = {
@@ -81,11 +84,13 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         "Content-Type": "application/json",
       }
     }
+    console.log("Finding invoice and users ....")
     const invoice = await Invoice.query().findById(payload.invoice_id);
     const users = await User
       .query()
       .where('role', USER_TYPES.ADMIN)
       .orWhere('id', invoice.issued_to);
+    console.log("Done. users ....", users)
 
     const { adminUser, recipientUser } = users.reduce((acc: any, user: User) => {
       if (user.role === USER_TYPES.ADMIN) {
@@ -98,16 +103,18 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
     // Deduct commission and send the rest
     const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
+    console.log("Generating invoice to pay mover ...", recipientUser);
     const newInvoice = await Invoice
       .query()
       .insert({
         issued_by: invoice.issued_to,
-        issued_to: adminUser.id,
+        issued_to: recipientUser.id,
         contract_id: invoice.contract_id,
         total: amountToSend,
         description: `Pay ${recipientUser.first_name} ksh ${amountToSend}`
       });
 
+    console.log("Done!")
     const postPayload = {
       invoice_id: newInvoice.id,
       amount: amountToSend,
@@ -137,15 +144,15 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
       SecurityCredential: getSecurityCredentials(),
-      CommandID: "SalaryPayment",
+      CommandID: "BusinessPayment",
       Amount: amount,
       PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
-      PartyB: "254708374149" || recipient_phone_number,
+      PartyB: "254728762287" || recipient_phone_number,
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
     };
 
-    console.log("payload", parameters);
+    console.log("payload ready to pay recipient", parameters);
     const options = {
       host: "sandbox.safaricom.co.ke",
       path: "/mpesa/b2c/v1/paymentrequest",
