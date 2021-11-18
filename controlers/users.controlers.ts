@@ -49,7 +49,9 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
       .returning(['id', 'email', 'first_name', 'last_name', 'phone_number'])
       .withGraphFetched({
         customer: true,
-        mover: true,
+        mover: {
+          vehicles: true
+        }
       });
 
     res.status(200);
