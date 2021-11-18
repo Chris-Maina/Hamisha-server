@@ -150,6 +150,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       PartyB: "254728762287" || recipient_phone_number,
       Remarks: "n/a",
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
+      CallBackURL: "`https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
       Occassion: "pay"
     };
