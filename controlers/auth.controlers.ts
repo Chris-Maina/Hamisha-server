@@ -3,7 +3,7 @@ import { Response, Router, Request, NextFunction } from 'express';
 
 import { USER_TYPES } from '../common/constants';
 import { User, Mover, Customer, Vehicle } from '../models';
-import { registerSchema, loginSchema } from '../schemas';
+import { registerSchema, loginSchema, moverRegisterSchema } from '../schemas';
 import { RequestWithPayload, S3UploadedObject } from '../common/interfaces';
 import {
   verifyToken,
@@ -19,7 +19,10 @@ const router = Router();
 
 router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Response, next: NextFunction) => {
   try {
-    const result = await registerSchema.validateAsync(req.body);
+    const result = req.body.type === USER_TYPES.CUSTOMER ? 
+      await registerSchema.validateAsync(req.body) 
+    : await moverRegisterSchema.validateAsync(req.body);
+    
     const {
       email,
       password,
