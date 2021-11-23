@@ -8,7 +8,6 @@ import createHttpError from "http-errors";
 import { COMMISSION, USER_TYPES } from "../common/constants";
 import {
   getTimestamp,
-  urlWithParams,
   makeApiRequest,
   getMpesaAuthToken,
   mapMpesaKeysToSnakeCase,
@@ -55,7 +54,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     const response = await makeApiRequest(options, payload);
     res.status(201);
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     next(new createHttpError.BadRequest(error.message));
   }
 });
@@ -64,16 +63,15 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id } = req.query;
-    console.log("Response from mpesa", req.body)
+
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
 
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
-    console.log("Saving payment ....")
+
     await Payment.query().insert(payload);
-    console.log("Done")
 
     // make request to send to recipitent
     const options = {
@@ -84,13 +82,12 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         "Content-Type": "application/json",
       }
     }
-    console.log("Finding invoice and users ....")
+
     const invoice = await Invoice.query().findById(payload.invoice_id);
     const users = await User
       .query()
       .where('role', USER_TYPES.ADMIN)
       .orWhere('id', invoice.issued_to);
-    console.log("Done. users ....", users)
 
     const { adminUser, recipientUser } = users.reduce((acc: any, user: User) => {
       if (user.role === USER_TYPES.ADMIN) {
@@ -103,18 +100,16 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
     // Deduct commission and send the rest
     const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
-    console.log("Generating invoice to pay mover ...", recipientUser);
     const newInvoice = await Invoice
       .query()
       .insert({
-        issued_by: invoice.issued_to,
+        issued_by: adminUser.id,
         issued_to: recipientUser.id,
         contract_id: invoice.contract_id,
         total: amountToSend,
         description: `Pay ${recipientUser.first_name} ksh ${amountToSend}`
       });
 
-    console.log("Done!")
     const postPayload = {
       invoice_id: newInvoice.id,
       amount: amountToSend,
@@ -155,7 +150,6 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       Occassion: "pay"
     };
 
-    console.log("payload ready to pay recipient", parameters);
     const options = {
       host: "sandbox.safaricom.co.ke",
       path: "/mpesa/b2c/v1/paymentrequest",
@@ -166,8 +160,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       }
     }
 
-    const response = await makeApiRequest(options, parameters);
-    console.log("sendtorecipient response >>>>", response);
+    await makeApiRequest(options, parameters);
   } catch (error) {
     console.log("Error >>>>>>>>>", error)
     next(error);
