@@ -14,7 +14,7 @@
     "migrate:down": "./node_modules/.bin/knex migrate:down",
     "seed:make": "./node_modules/.bin/knex seed:make -x ts",
     "seed:run": "./node_modules/.bin/knex seed:run",
-    "migrate:latest": "./node_modules/.bin/knex migrate:latest",
+    "migrate:latest": "knex migrate:latest",
     "migrate:make": "./node_modules/.bin/knex migrate:make -x ts",
     "migrate:rollback": "./node_modules/.bin/knex migrate:rollback"
   },
