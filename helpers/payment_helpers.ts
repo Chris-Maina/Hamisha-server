@@ -33,6 +33,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
       response.setEncoding('utf8');
 
       if (response.statusCode !== 200) {
+        console.log("error response", response)
         reject(new Error("Could not process your payment"))
       }
 
@@ -48,6 +49,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
     const req = request(options, callback);
 
     req.on('error', function (err) {
+      console.log("error ??????", err)
       reject(err)
     });
 

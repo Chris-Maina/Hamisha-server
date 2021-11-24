@@ -69,7 +69,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
-
+    console.log(">>>>>>> lipa na mpesa success")
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
