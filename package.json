@@ -1,6 +1,7 @@
 {
   "name": "hamisha_be",
   "version": "1.0.0",
+  "type": "module",
   "description": "Help users bid for jobs related to moving a package from one place to another",
   "main": "dist/index.js",
   "author": "Chris Maina",
