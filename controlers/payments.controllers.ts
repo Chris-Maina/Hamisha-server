@@ -18,7 +18,7 @@ import { Invoice, Payment, User } from "../models";
 const router = Router();
 
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
-  const { amount, invoice_id, phoneNumber } = req.body;
+  const { amount, invoice_id, issued_by, issued_to, contract_id } = req.body;
   try {
     /**
      * Check to see if you have mpesa token. You can use Redis here
@@ -26,6 +26,9 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
      * if no, generate a new token
      */
     const token = await getMpesaAuthToken();
+    const sender = await User
+      .query()
+      .findById(issued_to);
 
     const timeStamp = getTimestamp();
     const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
@@ -35,10 +38,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       "Timestamp": timeStamp,
       "TransactionType": "CustomerPayBillOnline",
       "Amount": amount,
-      "PartyA": phoneNumber, // the MSISDN sending the funds
+      "PartyA": sender.phone_number, // the MSISDN sending the funds
       "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
-      "PhoneNumber": phoneNumber, // the MSISDN sending the funds
-      "CallBackURL": `https://hamisha-api.herokuapp.com/api/payments/lipanampesa?invoice_id=${invoice_id}`,
+      "PhoneNumber": sender.phone_number, // the MSISDN sending the funds
+      "CallBackURL": `https://hamisha-api.herokuapp.com/api/payments/lipanampesa?invoice_id=${invoice_id}&issued_by=${issued_by}&contract_id=${contract_id}`,
       "AccountReference": "Hamisha", // Identifier of the transaction for CustomerPayBillOnline transaction type
       "TransactionDesc": `Payment for invoice with id ${invoice_id}`
     }
@@ -62,7 +65,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 // Webhook to listen to lipa na mpesa stkpush response
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { invoice_id } = req.query;
+    const { invoice_id, issued_by, contract_id } = req.query;
 
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
@@ -70,42 +73,34 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
-
     await Payment.query().insert(payload);
 
-    // make request to send to recipitent
-    const options = {
-      host: "hamisha-api.herokuapp.com",
-      path: "/api/payments/sendtorecipient",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      }
-    }
-
-    const invoice = await Invoice.query().findById(payload.invoice_id);
+    const receipientUserId = parseInt(issued_by as string, 10);
     const users = await User
       .query()
       .where('role', USER_TYPES.ADMIN)
-      .orWhere('id', invoice.issued_to);
-
+      .orWhere('id', receipientUserId);
     const { adminUser, recipientUser } = users.reduce((acc: any, user: User) => {
       if (user.role === USER_TYPES.ADMIN) {
         acc['adminUser'] = user;
-      } else if (user.id === invoice.issued_to) {
+      } else if (user.id === receipientUserId) {
         acc['recipientUser'] = user;
       }
       return acc;
     }, { adminUser: undefined, recipientUser: undefined })
 
     // Deduct commission and send the rest
-    const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
+    // const amountToSend: number = payload.amount - (COMMISSION * payload.amount);
+    const amountToSend: number = 1;
+
+    const contractId = parseInt(contract_id as string, 10);
+    // Also create an invoice from issued_to (sender/customer) to admin, amount being commission amount
     const newInvoice = await Invoice
       .query()
       .insert({
         issued_by: adminUser.id,
         issued_to: recipientUser.id,
-        contract_id: invoice.contract_id,
+        contract_id: contractId,
         total: amountToSend,
         description: `Pay ${recipientUser.first_name} ksh ${amountToSend}`
       });
@@ -115,6 +110,15 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       amount: amountToSend,
       sender_phone_number: adminUser.phone_number,
       recipient_phone_number: recipientUser.phone_number
+    }
+    // make request to send to recipitent
+    const options = {
+      host: "hamisha-api.herokuapp.com",
+      path: "/api/payments/sendtorecipient",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
     }
     await makeApiRequest(options, postPayload);
     
@@ -145,9 +149,8 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       PartyB: "254728762287" || recipient_phone_number,
       Remarks: "n/a",
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
-      CallBackURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
-      Occassion: "pay"
+      Occassion: "pay for service"
     };
 
     const options = {
