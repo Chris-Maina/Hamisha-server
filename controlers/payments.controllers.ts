@@ -55,10 +55,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    await makeApiRequest(options, payload);
+    const response = await makeApiRequest(options, payload);
   
-    // res.status(201);
-    // res.send(response);
+    res.status(201);
+    res.send(response);
   } catch (error: any) {
     next(new createHttpError.BadRequest(error.message));
   }
