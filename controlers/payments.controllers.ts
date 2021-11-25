@@ -54,10 +54,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    const response = await makeApiRequest(options, payload);
-    console.log("Response lipa na mpesa", response)
-    res.status(201);
-    res.send(response);
+    await makeApiRequest(options, payload);
+  
+    // res.status(201);
+    // res.send(response);
   } catch (error: any) {
     next(new createHttpError.BadRequest(error.message));
   }
@@ -67,7 +67,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id, issued_by, contract_id } = req.query;
-
+    console.log("Response lipa na mpesa", req.body)
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
     console.log(">>>>>>> lipa na mpesa success")
