@@ -55,6 +55,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       }
     }
     const response = await makeApiRequest(options, payload);
+    console.log("Response lipa na mpesa", response)
     res.status(201);
     res.send(response);
   } catch (error: any) {
