@@ -51,7 +51,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://sandbox.safaricom.co.ke",
+        "Access-Control-Allow-Origin": "https://hamisha-api.herokuapp.com",
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
