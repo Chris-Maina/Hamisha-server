@@ -105,22 +105,52 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         description: `Pay ${recipientUser.first_name} ksh ${amountToSend}`
       });
 
-    const postPayload = {
-      invoice_id: newInvoice.id,
-      amount: amountToSend,
-      sender_phone_number: adminUser.phone_number,
-      recipient_phone_number: recipientUser.phone_number
-    }
-    // make request to send to recipitent
+    // const postPayload = {
+    //   invoice_id: newInvoice.id,
+    //   amount: amountToSend,
+    //   sender_phone_number: adminUser.phone_number,
+    //   recipient_phone_number: recipientUser.phone_number
+    // }
+    // // make request to send to recipitent
+    // const options = {
+    //   host: "hamisha-api.herokuapp.com",
+    //   path: "/api/payments/sendtorecipient",
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   }
+    // }
+    // await makeApiRequest(options, postPayload);
+
+    const token = await getMpesaAuthToken();
+    const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
+
+    // Create payload to pay recipient
+    const parameters = {
+      InitiatorName: process.env.MPESA_INITIATOR_NAME,
+      SecurityCredential: getSecurityCredentials(),
+      CommandID: "BusinessPayment",
+      Amount: amountToSend,
+      PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
+      PartyB: recipientUser.phone_number,
+      Remarks: "n/a",
+      QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
+      ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${newInvoice.id}&sender=${adminUser.phone_number}`,
+      Occassion: "pay for service"
+    };
+
     const options = {
-      host: "hamisha-api.herokuapp.com",
-      path: "/api/payments/sendtorecipient",
+      host: "sandbox.safaricom.co.ke",
+      path: "/mpesa/b2c/v1/paymentrequest",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    await makeApiRequest(options, postPayload);
+
+    // make request to send to recipitent
+    await makeApiRequest(options, parameters);
     
     // respond to safaricom servers with a success message
     res.json({
