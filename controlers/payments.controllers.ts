@@ -134,7 +134,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       SecurityCredential: await getSecurityCredentials(),
       CommandID: "BusinessPayment",
       Amount: amountToSend,
-      PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
+      PartyA: "600123",//  B2C organization shortcode
       PartyB: recipientUser.phone_number,
       Remarks: "n/a",
       QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
@@ -151,7 +151,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    console.log(">>>>>>> sending request to pay ", recipientUser.phone_number)
+    console.log(">>>>>>> sending request to pay ", parameters)
     // make request to send to recipitent
     await makeApiRequest(options, parameters);
     
