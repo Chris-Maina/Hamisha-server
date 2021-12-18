@@ -68,7 +68,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id, issued_by, contract_id } = req.query;
-    console.log("Response lipa na mpesa", req.body)
+
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
     console.log(">>>>>>> lipa na mpesa success")
@@ -96,7 +96,8 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const amountToSend: number = 1;
 
     const contractId = parseInt(contract_id as string, 10);
-    // Also create an invoice from issued_to (sender/customer) to admin, amount being commission amount
+    // TODO: Also create an invoice from issued_to (sender/customer) to admin, amount being commission amount
+
     const newInvoice = await Invoice
       .query()
       .insert({
@@ -150,7 +151,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-
+    console.log(">>>>>>> sending request to pay ", recipientUser.phone_number)
     // make request to send to recipitent
     await makeApiRequest(options, parameters);
     
