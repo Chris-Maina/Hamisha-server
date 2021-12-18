@@ -4,7 +4,7 @@ import {
   constants,
   X509Certificate
  } from "crypto";
-import { readFileSync } from "fs";
+import { readFile } from "fs";
 
 export interface MpesaToken {
   access_token: string,
@@ -137,23 +137,31 @@ const getByteArray = (stringToConvert: string): Uint8Array => {
   return enc.encode(stringToConvert);
 }
 
-export const getSecurityCredentials = (): string => {
-  try {
-    // Read file. Specify file location from root folder
-    const x509 = new X509Certificate(readFileSync("security/SandboxCertificate.cer"));
-    // Convert pwd to byte array
-    const byteArray = getByteArray("Safaricom980!");
+const createSecurityCredentialsFromData = (fileData: Buffer): string => {
+  // Convert to X509Certificate
+  const x509 = new X509Certificate(fileData);
+  // Convert pwd to byte array
+  const byteArray = getByteArray("Safaricom980!");
+  return publicEncrypt(
+    {
+      key: x509.publicKey,
+      padding: constants.RSA_PKCS1_PADDING,
+    },
+    byteArray
+  ).toString('base64');
+}
 
-    return publicEncrypt(
-      {
-        key: x509.publicKey,
-        padding: constants.RSA_PKCS1_PADDING,
-      },
-      byteArray
-    ).toString('base64');
-  } catch (error) {
-    throw error;
-  }
+export const getSecurityCredentials = (): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    // Read file asynchronously
+    readFile("security/SandboxCertificate.cer", null, (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      const securityCredentials: string = createSecurityCredentialsFromData(data)
+      resolve(securityCredentials)
+    })
+  })
 }
 
 export const urlWithParams = (url: string, params: any): string => {

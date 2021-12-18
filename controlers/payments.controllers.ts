@@ -130,7 +130,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     // Create payload to pay recipient
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
-      SecurityCredential: getSecurityCredentials(),
+      SecurityCredential: await getSecurityCredentials(),
       CommandID: "BusinessPayment",
       Amount: amountToSend,
       PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
@@ -174,7 +174,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
     // Send MPESA request to pay recipient
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
-      SecurityCredential: getSecurityCredentials(),
+      SecurityCredential: await getSecurityCredentials(),
       CommandID: "BusinessPayment",
       Amount: amount,
       PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
