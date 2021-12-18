@@ -2,6 +2,7 @@ import { request } from "https";
 import { 
   publicEncrypt,
   constants,
+  X509Certificate
  } from "crypto";
 import { readFileSync } from "fs";
 
@@ -131,20 +132,24 @@ const formatMpesaValues = (key: string, value: any) => {
   }
 }
 
+const getByteArray = (stringToConvert: string): Uint8Array => {
+  const enc = new TextEncoder();
+  return enc.encode(stringToConvert);
+}
+
 export const getSecurityCredentials = (): string => {
   try {
-    // Get public key from cer file. Specify file location from root folder
-    const publicKey = readFileSync("security/SandboxCertificate.cer", 'utf-8');
-
-    // encode password with base64
-    const base64Buffer = Buffer.from(process.env.MPESA_INITIATOR_PWD!, "base64");
+    // Read file. Specify file location from root folder
+    const x509 = new X509Certificate(readFileSync("security/SandboxCertificate.cer"));
+    // Convert pwd to byte array
+    const byteArray = getByteArray("Safaricom980!");
 
     return publicEncrypt(
       {
-        key: publicKey,
+        key: x509.publicKey,
         padding: constants.RSA_PKCS1_PADDING,
       },
-      base64Buffer
+      byteArray
     ).toString('base64');
   } catch (error) {
     throw error;
@@ -166,4 +171,3 @@ export const urlWithParams = (url: string, params: any): string => {
 
   return url + paramsStr;
 }
-
