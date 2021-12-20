@@ -56,6 +56,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
+    console.log(" >>>>> Start >>>>>")
     const response = await makeApiRequest(options, payload);
   
     res.status(201);
