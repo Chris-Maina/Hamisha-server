@@ -34,6 +34,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
       response.setEncoding('utf8');
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
+        console.log("Response error", response.statusCode, response.statusMessage);
         reject(new Error(response.statusMessage || "Could not process your request"));
       }
 
@@ -45,6 +46,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
         try {
           output = output && JSON.parse(output);
         } catch (error) {
+          console.log("Parse error", error)
           reject(error);
         }
         resolve(output);
@@ -54,6 +56,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
     const req = request(options, callback);
 
     req.on('error', function (err) {
+      console.log("Err response", err)
       reject(err)
     });
 
