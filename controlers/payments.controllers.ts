@@ -26,6 +26,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
      * if no, generate a new token
      */
     const token = await getMpesaAuthToken();
+
     const sender = await User
       .query()
       .findById(issued_to);
@@ -126,12 +127,14 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     // await makeApiRequest(options, postPayload);
 
     const token = await getMpesaAuthToken();
+    const securityCredentials = await getSecurityCredentials();
     const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
-
+    console.log("token >>>>", token);
+    console.log("securityCredentials >>>", securityCredentials);
     // Create payload to pay recipient
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
-      SecurityCredential: await getSecurityCredentials(),
+      SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amountToSend,
       PartyA: 600123,//  B2C organization shortcode
