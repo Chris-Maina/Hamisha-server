@@ -33,28 +33,31 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
       let output = "";
       response.setEncoding('utf8');
 
-      if (response.statusCode !== 200) {
-        console.log("error response", response)
-        reject(new Error("Could not process your payment"))
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        reject(new Error(response.statusMessage || "Could not process your request"));
       }
 
       response.on('data', function (chunk: any) {
-        output += chunk;
+        output += chunk.toString();
       });
 
       response.on('end', function () {
-        resolve(JSON.parse(output));
+        try {
+          output = output && JSON.parse(output);
+        } catch (error) {
+          reject(error);
+        }
+        resolve(output);
       });
     }
 
     const req = request(options, callback);
 
     req.on('error', function (err) {
-      console.log("error ??????", err)
       reject(err)
     });
 
-    if (options.method === "POST") {
+    if (options?.method === "POST") {
       req.write(JSON.stringify(postPayload));
     }
 
@@ -63,14 +66,14 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
 }
 
 export const getMpesaAuthToken = async (): Promise<any> => {
+  const encodedConsumerKeyAndSecret = Buffer.from(`uuGx7XIog9QUx3tGFuH6BjModO0dVhM1:CNVS5P2OI5k2VIYC`).toString("base64");
 
   const options = {
     host: "sandbox.safaricom.co.ke",
     path: "/oauth/v1/generate?grant_type=client_credentials",
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Basic ${Buffer.from(process.env.CONSUMER_KEY + ":" + process.env.CONSUMER_SECRET).toString("base64")}`,
+      "Authorization": `Basic ${encodedConsumerKeyAndSecret}`,
     }
   }
   return makeApiRequest(options);
