@@ -148,6 +148,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://hamisha-api.herokuapp.com",
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
