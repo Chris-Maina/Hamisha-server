@@ -76,7 +76,7 @@ export const getMpesaAuthToken = async (): Promise<any> => {
     path: "/oauth/v1/generate?grant_type=client_credentials",
     method: "GET",
     headers: {
-      "Authorization": `Bearer ${encodedConsumerKeyAndSecret}`,
+      "Authorization": `Basic ${encodedConsumerKeyAndSecret}`,
     }
   }
   return makeApiRequest(options);
