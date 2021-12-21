@@ -56,6 +56,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
+    console.log(">>>>>> Start >>>>>>>")
     const response = await makeApiRequest(options, payload);
   
     res.status(201);
@@ -221,7 +222,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
     payload['phone_number'] = sender;
     await Payment.query().insert(payload);
-    
+
     // respond to safaricom servers with a success message
     res.json({
       "ResponseCode": "00000000",
