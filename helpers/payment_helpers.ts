@@ -147,7 +147,8 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
   // Convert to X509Certificate
   const x509 = new X509Certificate(fileData);
   // Convert pwd to byte array
-  const byteArray = getByteArray("Safaricom980!");
+  console.log("ENV VAR", process.env.MPESA_INITIATOR_PWD)
+  const byteArray = getByteArray("Safaricom998!");
   return publicEncrypt(
     {
       key: x509.publicKey,
