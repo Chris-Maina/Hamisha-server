@@ -69,7 +69,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
 }
 
 export const getMpesaAuthToken = async (): Promise<any> => {
-  const encodedConsumerKeyAndSecret = Buffer.from(`3EoGbxkGUoM285JtUGKzcUzVRfjC65TI:r2MjPxG7uvgJafgu`).toString("base64");
+  const encodedConsumerKeyAndSecret = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
 
   const options = {
     host: "sandbox.safaricom.co.ke",
@@ -137,18 +137,26 @@ const formatMpesaValues = (key: string, value: any) => {
       return value;
   }
 }
-
+/**
+ * 
+ * @param stringToConvert 
+ * @returns Uint8Array - byte array
+ */
 const getByteArray = (stringToConvert: string): Uint8Array => {
   const enc = new TextEncoder();
   return enc.encode(stringToConvert);
 }
 
+/**
+ * Takes in data in certificate file, gets public key and encrypts initiator pwd
+ * @param fileData 
+ * @returns string - security credentials
+ */
 const createSecurityCredentialsFromData = (fileData: Buffer): string => {
   // Convert to X509Certificate
   const x509 = new X509Certificate(fileData);
   // Convert pwd to byte array
-  console.log("ENV VAR", process.env.MPESA_INITIATOR_PWD)
-  const byteArray = getByteArray("Safaricom998!");
+  const byteArray = getByteArray(process.env.MPESA_INITIATOR_PWD!);
   return publicEncrypt(
     {
       key: x509.publicKey,
