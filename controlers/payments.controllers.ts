@@ -56,7 +56,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    console.log(">>>>>> Start >>>>>>>")
+
     const response = await makeApiRequest(options, payload);
   
     res.status(201);
@@ -169,7 +169,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    console.log(">>>>>>> sending request to pay ", parameters)
+    console.log(">>>>>>> sending request to pay ")
     await makeApiRequest(options, parameters);
     res.status(200);
   } catch (error) {
