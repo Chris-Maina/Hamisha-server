@@ -44,6 +44,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
 
       response.on('end', function () {
         try {
+          console.log(">>> Output", output);
           output = output && JSON.parse(output);
         } catch (error) {
           console.log("Parse error", error)
