@@ -58,7 +58,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const response = await makeApiRequest(options, payload);
-  
+    console.log(">>>>> Start >>>>>");
     res.status(201);
     res.send(response);
   } catch (error: any) {
@@ -73,7 +73,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
-    console.log(">>>>>>> lipa na mpesa success")
+
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
@@ -134,7 +134,6 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       "ResponseDesc": "success"
     });
   } catch (error) {
-    console.log("lipa na mpesa error", error)
     next(error);
   }
 });
@@ -153,7 +152,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       CommandID: "BusinessPayment",
       Amount: amount,
       PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
-      PartyB: "254708374149" || recipient_phone_number,
+      PartyB: recipient_phone_number,
       Remarks: "Payment",
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
@@ -169,7 +168,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
-    console.log(">>>>>>> sending request to pay ")
+    console.log(">>>>>>> sending request to pay", parameters)
     await makeApiRequest(options, parameters);
     res.status(200);
   } catch (error) {
@@ -181,8 +180,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id, sender } = req.query;
-    console.log("invoice_id", invoice_id);
-    console.log("owner of short code or sender", sender)
+
     console.log("b2c success", req.body);
 
     if (req.body.Result.ResultCode !== 0) throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
@@ -199,7 +197,6 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
       "ResponseDesc": "success"
     });
   } catch (error) {
-    console.log("B2C Error >>>>>>>>>", error)
     next(error);
   }
 });
