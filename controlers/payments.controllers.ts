@@ -130,15 +130,14 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const token = await getMpesaAuthToken();
     const securityCredentials = await getSecurityCredentials();
     const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
-    console.log("token >>>>", token);
-    console.log("securityCredentials >>>", securityCredentials);
+
     // Create payload to pay recipient
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
       SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amountToSend,
-      PartyA: 600983,//  B2C organization shortcode
+      PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
       PartyB: `${recipientUser.phone_number}`,
       Remarks: "Test remarks",
       QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
@@ -210,27 +209,22 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { invoice_id, sender_phone_number } = req.query;
+    const { invoice_id, sender } = req.query;
     console.log("invoice_id", invoice_id);
-    console.log("owner of short code or sender", sender_phone_number)
+    console.log("owner of short code or sender", sender)
     console.log("b2c success", req.body);
-    /**
-     * THOUGHTS
-     * Create a business user who will be making payments. Hamisha admin user
-     * Create an invoice from this user to recipient user linked to the contract
-     * Add this payment to the Payment table
-     */
-    // if (req.body.Body.stkCallback.ResultCode === 0) {
+
+    if (req.body.Body.stkCallback.ResultCode === 0) {
       // Create a payment record
-      // const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
-      // payload['invoice_id'] = parseInt(invoice_id as string, 10);
-      // await Payment.query().insert(payload);
-    // }
+      const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
+      payload['invoice_id'] = parseInt(invoice_id as string, 10);
+      await Payment.query().insert(payload);
+    }
     // respond to safaricom servers with a success message
-    // res.json({
-    //   "ResponseCode": "00000000",
-    //   "ResponseDesc": "success"
-    // });
+    res.json({
+      "ResponseCode": "00000000",
+      "ResponseDesc": "success"
+    });
   } catch (error) {
     console.log("B2C Error >>>>>>>>>", error)
     next(error);
