@@ -103,15 +103,21 @@ interface CallbackMetadataItem {
   Value: any;
 }
 
+/**
+ * This object helps map MPESA keys to Payment table column names
+ */
 const KEYS: { [x: string]: string } = {
   'MpesaReceiptNumber': 'mpesa_receipt_no',
+  'TransactionReceipt': 'mpesa_receipt_no',
   'Amount': 'amount',
+  'TransactionAmount': 'amount',
   'PhoneNumber': 'phone_number',
-  'TransactionDate': 'payment_date'
+  'TransactionDate': 'payment_date',
+  'TransactionCompletedDateTime': 'payment_date'
 };
 
 /**
- * @description maps mpesa keys to snake case
+ * @description maps mpesa keys to payment table column names
  * @param itemArray {CallbackMetadataItem}
  * @returns {[string]: any} 
  */
@@ -130,6 +136,7 @@ export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
 const formatMpesaValues = (key: string, value: any) => {
   switch (key) {
     case KEYS['TransactionDate']:
+    case KEYS['TransactionCompletedDateTime']:
       return new Date(value);
     case KEYS['PhoneNumber']:
       return value.toString();
