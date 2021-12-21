@@ -127,36 +127,6 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     }
     await makeApiRequest(options, postPayload);
 
-    // const token = await getMpesaAuthToken();
-    // const securityCredentials = await getSecurityCredentials();
-    // const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
-
-    // // Create payload to pay recipient
-    // const parameters = {
-    //   InitiatorName: process.env.MPESA_INITIATOR_NAME,
-    //   SecurityCredential: securityCredentials,
-    //   CommandID: "BusinessPayment",
-    //   Amount: amountToSend,
-    //   PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
-    //   PartyB: `${recipientUser.phone_number}`,
-    //   Remarks: "Test remarks",
-    //   QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
-    //   ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${newInvoice.id}&sender=${adminUser.phone_number}`,
-    //   Occassion: "pay for service"
-    // };
-
-    // const options = {
-    //   host: "sandbox.safaricom.co.ke",
-    //   path: "/mpesa/b2c/v1/paymentrequest",
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "Authorization": `Bearer ${token?.access_token}`
-    //   }
-    // }
-    
-    // // make request to send to recipitent
-    // await makeApiRequest(options, parameters);
     
     // respond to safaricom servers with a success message
     res.json({
@@ -183,7 +153,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
       CommandID: "BusinessPayment",
       Amount: amount,
       PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
-      PartyB: recipient_phone_number,
+      PartyB: "254708374149" || recipient_phone_number,
       Remarks: "Payment",
       QueueTimeOutURL:	"https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoice_id}&sender=${sender_phone_number}`,
