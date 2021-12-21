@@ -69,14 +69,14 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
 }
 
 export const getMpesaAuthToken = async (): Promise<any> => {
-  const encodedConsumerKeyAndSecret = Buffer.from(`uuGx7XIog9QUx3tGFuH6BjModO0dVhM1:CNVS5P2OI5k2VIYC`).toString("base64");
+  const encodedConsumerKeyAndSecret = Buffer.from(`3EoGbxkGUoM285JtUGKzcUzVRfjC65TI:r2MjPxG7uvgJafgu`).toString("base64");
 
   const options = {
     host: "sandbox.safaricom.co.ke",
     path: "/oauth/v1/generate?grant_type=client_credentials",
     method: "GET",
     headers: {
-      "Authorization": `Basic ${encodedConsumerKeyAndSecret}`,
+      "Authorization": `Bearer ${encodedConsumerKeyAndSecret}`,
     }
   }
   return makeApiRequest(options);

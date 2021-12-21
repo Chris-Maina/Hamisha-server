@@ -138,9 +138,9 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amountToSend,
-      PartyA: 600123,//  B2C organization shortcode
-      PartyB: recipientUser.phone_number,
-      Remarks: "n/a",
+      PartyA: 600983,//  B2C organization shortcode
+      PartyB: `${recipientUser.phone_number}`,
+      Remarks: "Test remarks",
       QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
       ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${newInvoice.id}&sender=${adminUser.phone_number}`,
       Occassion: "pay for service"
