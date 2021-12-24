@@ -14,6 +14,7 @@ import {
 import { upload } from "../multer";
 import { uploadFile } from '../s3config';
 import { unlinkFile } from '../helpers/unlinkFileHelper';
+import { getResizeDestnFileLoc, resizeFormatImageToWebp } from '../helpers/image_helpers';
 
 const router = Router();
 
@@ -77,10 +78,17 @@ router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Res
         const vehicleExists = await Vehicle.query().findOne({ reg_number });
         if (vehicleExists) throw new createHttpError.Conflict(`Vehicle with ${reg_number} has already been registered`);
 
+        // Resize image and convert to webp format
+        await resizeFormatImageToWebp(req.file.path, req.file.filename);
+
         // Upload file
-        const uploadedFile: S3UploadedObject = await uploadFile(req.file);
-        // Unlike file 
+        const resizeFileLoc: string = getResizeDestnFileLoc(req.file.filename);
+        const uploadedFile: S3UploadedObject = await uploadFile(resizeFileLoc, req.file.filename);
+        
+        // Unlike file from multer and resized image sharp
         unlinkFile(req.file.path);
+        unlinkFile(resizeFileLoc);
+
         // add to vehicles table
         await Vehicle.query().insert({
           reg_number,
