@@ -1,5 +1,5 @@
 import S3Client from 'aws-sdk/clients/s3';
-import { createReadStream } from 'fs';
+import { createReadStream, PathLike } from 'fs';
 import type { Readable } from 'stream';
 import { S3UploadedObject } from './common/interfaces';
 
@@ -13,13 +13,13 @@ export const S3 = new S3Client({
  * Uploads a file to S3
  * @param file { path: string, filename: string }
  */
-export function uploadFile(file: Express.Multer.File): Promise<S3UploadedObject> {
-  const fileStream = createReadStream(file.path);
+export function uploadFile(pathLike: PathLike, filename: string): Promise<S3UploadedObject> {
+  const fileStream = createReadStream(pathLike);
 
   const uploadParams = {
     Bucket: process.env.S3_BUCKET_NAME || '',
     Body: fileStream,
-    Key: file.filename
+    Key: filename
   }
 
   return S3.upload(uploadParams).promise();
@@ -29,7 +29,7 @@ export function uploadFile(file: Express.Multer.File): Promise<S3UploadedObject>
  * Downloads a file from S3
  * @param fileKey - string
  */
-export function getFileStream(fileKey:string): Readable {
+export function getFileStream(fileKey: string): Readable {
   const downloadParams = {
     Key: fileKey,
     Bucket: process.env.S3_BUCKET_NAME || '',
