@@ -7,6 +7,7 @@ import Vehicle from "../models/Vehicle";
 import { getFileStream, uploadFile } from "../s3config";
 import { S3UploadedObject } from "../common/interfaces";
 import { unlinkFile } from "../helpers/unlinkFileHelper";
+import { getResizeDestnFileLoc, resizeFormatImageToWebp } from "../helpers/image_helpers";
 
 const router = Router();
 
@@ -23,11 +24,17 @@ router.post('/', upload.single('vehicle_pic'), async (req: any, res: Response, n
       const vehicleExists = await Vehicle.query().findOne({ reg_number });
       if (vehicleExists) throw new createHttpError.Conflict(`Vehicle with ${reg_number} has already been registered`);
   
-      // upload file
-      const uploadedFile: S3UploadedObject = await uploadFile(req.file);
+      // Resize image and convert to webp format
+      await resizeFormatImageToWebp(req.file.path, req.file.filename);
 
-      // unlink file
+      // upload file
+      const resizeFileLoc: string = getResizeDestnFileLoc(req.file.filename);
+      const uploadedFile: S3UploadedObject = await uploadFile(resizeFileLoc, req.file.filename);
+
+      // Unlike file from multer and resized image sharp
       unlinkFile(req.file.path);
+      unlinkFile(resizeFileLoc);
+
       // save file path in DB
       const response = await Vehicle.query().insert({
         mover_id: parseInt(mover_id, 10),
