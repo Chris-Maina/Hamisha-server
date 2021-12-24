@@ -41,3 +41,5 @@ export const MPESA_API = {
   LipaNaMpesa: "LIPA NA M-PESA ONLINE",
   B2C: "Business To Client"
 }
+
+export const FILE_DEST: string = "./public/images";
