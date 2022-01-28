@@ -1,3 +1,4 @@
+import { ValidationError } from 'joi';
 import createHttpError from 'http-errors';
 import { Router, Request, Response, NextFunction } from 'express';
 
@@ -42,7 +43,7 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
       });
     res.status(201);
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
