@@ -33,7 +33,8 @@ export const jobSchema = Joi.object({
   description: Joi.string().required(),
   payment_amount: Joi.number().required(),
   expected_duration: Joi.string().required(),
-  payment_type: Joi.number().required()
+  payment_type: Joi.number().required(),
+  location: Joi.string().required(),
 });
 
 export const contractSchema = Joi.object({

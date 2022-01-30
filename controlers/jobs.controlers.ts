@@ -1,4 +1,3 @@
-import { ValidationError } from 'joi';
 import createHttpError from 'http-errors';
 import { Router, Request, Response, NextFunction } from 'express';
 
@@ -21,6 +20,7 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
       payment_amount,
       expected_duration,
       payment_type,
+      location
     } = result;
 
     const customer = await Customer.query().findOne({ user_id: id });
@@ -29,6 +29,7 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     const response = await Job.query()
       .insert({
         title,
+        location,
         description,
         customer_id: customer.id,
         payment_type,
@@ -36,7 +37,7 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
         expected_duration,
       })
       .returning(
-        ['id', 'title', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'title', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
       )
       .withGraphFetched({
         job_type: true
@@ -101,7 +102,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
       .patch(req.body)
       .where('id', id)
       .returning(
-        ['id', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
       )
       .first()
       .withGraphFetched({
@@ -123,7 +124,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
       .update(req.body)
       .where('id', id)
       .returning(
-        ['id', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
       )
       .first()
       .withGraphFetched({

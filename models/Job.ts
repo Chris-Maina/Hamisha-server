@@ -6,6 +6,7 @@ import Customer from './Customer';
 class Job extends Model {
   id!: number
   title!: string
+  location!: string
   created_at!: Date
   payment_type!: number | { name: string }
   expected_duration!: string
