@@ -28,10 +28,8 @@ export const proposalSchema = Joi.object({
 });
 
 export const jobSchema = Joi.object({
-  title: Joi.string().required(),
-  description: Joi.string().required(),
-  payment_amount: Joi.number().required(),
-  expected_duration: Joi.string().required(),
+  payment_amount: Joi.number().optional(),
+  expected_duration: Joi.string().optional(),
   location: Joi.string().required(),
 });
 

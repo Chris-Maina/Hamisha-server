@@ -15,8 +15,6 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     const result = await jobSchema.validateAsync(req.body);
 
     const {
-      title,
-      description,
       payment_amount,
       expected_duration,
       location
@@ -27,15 +25,13 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
 
     const response = await Job.query()
       .insert({
-        title,
         location,
-        description,
         customer_id: customer.id,
         payment_amount,
         expected_duration,
       })
       .returning(
-        ['id', 'title', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'created_at', 'expected_duration', 'payment_amount']
       );
     res.status(201);
     res.send(response);
@@ -94,7 +90,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
       .patch(req.body)
       .where('id', id)
       .returning(
-        ['id', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'created_at', 'expected_duration', 'payment_amount']
       )
       .first()
       .withGraphFetched({
@@ -115,7 +111,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
       .update(req.body)
       .where('id', id)
       .returning(
-        ['id', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'created_at', 'expected_duration', 'payment_amount']
       )
       .first()
       .withGraphFetched({

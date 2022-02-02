@@ -4,13 +4,11 @@ import Customer from './Customer';
 
 class Job extends Model {
   id!: number
-  title!: string
   location!: string
   created_at!: Date
   expected_duration!: string
   payment_amount!: number
   customer_id!: number
-  description!: string
 
   static get tableName() {
     return "jobs"
