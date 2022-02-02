@@ -19,7 +19,6 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
       description,
       payment_amount,
       expected_duration,
-      payment_type,
       location
     } = result;
 
@@ -32,16 +31,12 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
         location,
         description,
         customer_id: customer.id,
-        payment_type,
         payment_amount,
         expected_duration,
       })
       .returning(
         ['id', 'title', 'location', 'description', 'created_at', 'expected_duration', 'payment_amount']
-      )
-      .withGraphFetched({
-        job_type: true
-      });
+      );
     res.status(201);
     res.send(response);
   } catch (error: any) {
@@ -56,7 +51,6 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
       .query()
       .orderBy('created_at', 'desc')
       .withGraphFetched({
-        job_type: true,
         proposals: true,
       });
     res.status(200);
@@ -75,7 +69,6 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       .query()
       .findById(id)
       .withGraphFetched({
-        job_type: true,
         customer: {
           account: true,
         },
@@ -83,7 +76,6 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
           mover: {
             account: true,
           },
-          job_type: true,
           contract: true
         },
       });
@@ -106,7 +98,6 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
       )
       .first()
       .withGraphFetched({
-        job_type: true,
         proposals: true,
       });
     res.status(200);
@@ -128,7 +119,6 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
       )
       .first()
       .withGraphFetched({
-        job_type: true,
         proposals: true,
       });
     res.status(200);
