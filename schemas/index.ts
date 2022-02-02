@@ -23,7 +23,6 @@ export const moverRegisterSchema = registerSchema.keys({
 
 export const proposalSchema = Joi.object({
   payment_amount: Joi.number().required(),
-  payment_type: Joi.number().required(),
   job_id: Joi.number().required(),
   mover_id: Joi.number().required(),
 });
@@ -33,7 +32,6 @@ export const jobSchema = Joi.object({
   description: Joi.string().required(),
   payment_amount: Joi.number().required(),
   expected_duration: Joi.string().required(),
-  payment_type: Joi.number().required(),
   location: Joi.string().required(),
 });
 

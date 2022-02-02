@@ -2,7 +2,6 @@ import { Model } from "objection";
 import Job from "./Job";
 import Mover from "./Mover";
 import Contract from "./Contract";
-import PaymentType from "./PaymentType";
 
 class Proposal extends Model {
   id!: number
@@ -13,7 +12,6 @@ class Proposal extends Model {
   payment_type!: number
   payment_amount!: number
   mover!: Mover
-  job_type!: PaymentType
 
   static get tableName() {
     return "proposals";
@@ -28,15 +26,6 @@ class Proposal extends Model {
         join: {
           from: "proposals.mover_id",
           to: "movers.id"
-        }
-      },
-      job_type: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: PaymentType,
-        filter: (query: any) => query.select('id', 'name'),
-        join: {
-          from: 'proposals.payment_type',
-          to: 'payment_types.id'
         }
       },
       job: {
