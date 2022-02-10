@@ -28,9 +28,9 @@ export const proposalSchema = Joi.object({
 });
 
 export const jobSchema = Joi.object({
-  payment_amount: Joi.number().optional(),
   expected_duration: Joi.string().optional(),
   location: Joi.string().required(),
+  collection_date: Joi.date().required(),
 });
 
 export const contractSchema = Joi.object({

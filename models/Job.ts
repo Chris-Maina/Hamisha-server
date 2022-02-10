@@ -7,8 +7,8 @@ class Job extends Model {
   location!: string
   created_at!: Date
   expected_duration!: string
-  payment_amount!: number
   customer_id!: number
+  collection_date!: Date
 
   static get tableName() {
     return "jobs"
