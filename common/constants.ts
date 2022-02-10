@@ -17,9 +17,9 @@ export const PROPOSAL_STATUS = {
 
 export const CONTRACT_STATUS = {
   DRAFT: 'draft',
-  DECLINED: 'contract declined',
-  ACCEPTED: 'contract accepted',
-  CLOSED: 'contract closed',
+  DECLINED: 'rejected', // job was rejected by mover
+  ACCEPTED: 'active', // job has started
+  CLOSED: 'closed', // job has been completed successfully
 };
 
 
