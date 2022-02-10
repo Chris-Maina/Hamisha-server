@@ -51,9 +51,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
           mover: {
             account: true
           },
-          proposal: {
-            job_type: true
-          },
+          proposal: true,
         });
     } else {
       response = await Contract
@@ -64,9 +62,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
           customer: {
             account: true
           },
-          proposal: {
-            job_type: true
-          },
+          proposal: true,
         });;
     }
 
@@ -100,9 +96,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         mover: {
           account: true
         },
-        proposal: {
-          job_type: true
-        },
+        proposal: true,
       });
   
     res.status(201);
@@ -127,9 +121,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
         mover: {
           account: true
         },
-        proposal: {
-          job_type: true
-        },
+        proposal: true,
       });
 
     updateProposalFromContract(response);
@@ -155,9 +147,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         mover: {
           account: true
         },
-        proposal: {
-          job_type: true
-        },
+        proposal: true,
       });
 
     updateProposalFromContract(response);
@@ -194,9 +184,7 @@ router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         customer: {
           account: true
         },
-        proposal: {
-          job_type: true
-        },
+        proposal: true,
       });
 
     res.status(200);
