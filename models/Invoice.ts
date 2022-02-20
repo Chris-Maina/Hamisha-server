@@ -3,6 +3,9 @@ import Contract from './Contract';
 import Payment from './Payment';
 import User from './User';
 
+/**
+ * An invoice is a payment demand issued by a seller to the buyer of goods or services after the sale
+ */
 class Invoice extends Model {
   id!: number
   created_at!: Date
@@ -12,6 +15,8 @@ class Invoice extends Model {
   issued_by!: number
   issued_to!: number
   total!: number
+  recipient: User | undefined;
+  creator: User | undefined;
 
   static get tableName() {
     return "invoices";
@@ -20,7 +25,8 @@ class Invoice extends Model {
 
   static get relationMappings() {
     return {
-      creator: {
+      // represents the seller of service
+       creator: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         filter: (query: any) => query.select('id', 'first_name', 'last_name'),
@@ -29,6 +35,7 @@ class Invoice extends Model {
           to: "users.id"
         }
       },
+      // represent the person receiving the invoice i.e buyer/recipient of service
       recipient: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,

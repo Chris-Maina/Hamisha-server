@@ -48,9 +48,16 @@ export const contractSchema = Joi.object({
 });
 
 export const invoiceSchema = Joi.object({
-  description: Joi.string().required(),
-  issued_by: Joi.number().required(),
-  issued_to: Joi.number().required(),
+  issued_by: Joi.number().optional(),
+  issued_to: Joi.number().optional(),
+  contract_id: Joi.number().required(),
+  due_date: Joi.date().optional(),
+  total: Joi.number().required(),
+});
+
+export const paymentSchema = Joi.object({
+  customer_id: Joi.number().required(),
+  mover_id: Joi.number().required(),
   contract_id: Joi.number().required(),
   due_date: Joi.date().optional(),
   total: Joi.number().required(),
