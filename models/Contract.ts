@@ -1,10 +1,16 @@
 import { Model } from "objection";
+import Invoice from "./Invoice";
 import Customer from "./Customer";
 import Mover from "./Mover";
-import PaymentType from "./PaymentType";
 import Proposal from "./Proposal";
 
 class Contract extends Model {
+  status!: string;
+  title!: string;
+  proposal_id!: number;
+  customer_id!: number;
+  mover_id!: number;
+
   static get tableName() {
     return "contracts";
   }
@@ -37,6 +43,15 @@ class Contract extends Model {
           from: "contracts.proposal_id",
           to: "proposals.id"
         },
+      },
+      invoice: {
+        relation: Model.HasManyRelation,
+        modelClass: Invoice,
+        filter: (query: any) => query.select('id'),
+        join: {
+          from: "contracts.id",
+          to: "invoices.contract_id"
+        }
       }
     };
   };
