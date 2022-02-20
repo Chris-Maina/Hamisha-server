@@ -4,6 +4,8 @@ import { Invoice, User } from "../models";
 import { invoiceSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { RequestWithPayload } from "../common/interfaces";
+import { USER_TYPES } from "../common/constants";
+import { b2cMpesaRequest, lipaNaMpesaRequest } from "../helpers/payment_helpers";
 
 const router = Router();
 
@@ -55,20 +57,46 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
 router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await invoiceSchema.validateAsync(req.body);
-
-    const response = await Invoice
-      .query()
-      .insert(result)
-      .returning(['id', 'created_at', 'description'])
-      .withGraphFetched({
-        contract: {
-          proposal: true
-        },
-        creator: true,
-        recipient: true,
+    const adminUser = await User.query().findOne({ role: USER_TYPES.ADMIN });
+    let invoice;
+    if (req.body?.issued_to || result.issued_to) {
+      // Sending an invoice from hamisha/admin to customer
+      invoice = await Invoice
+        .query()
+        .insert({ ...result, issued_by: adminUser.id })
+        .returning(['id', 'contract_id', 'issued_by'])
+        .withGraphFetched({
+          recipient: true,
       });
+      await lipaNaMpesaRequest(
+        invoice.total, 
+        invoice.id,
+        invoice.contract_id,
+        invoice.issued_by,
+        invoice.recipient!.phone_number
+      );
+      console.log(">>>>> Start >>>>>");
+    }
+    if (req.body?.issued_by || result.issued_by) {
+      // Sending an invoice from mover to hamisha/admin
+      invoice = await Invoice
+        .query()
+        .insert({ ...result, issued_to: adminUser.id })
+        .returning(['id', 'contract_id', 'issued_by'])
+        .withGraphFetched({
+          creator: true,
+        });
+
+        await b2cMpesaRequest(
+          invoice.total,
+          invoice.id,
+          invoice.contract_id,
+          invoice.creator!.phone_number
+        );
+    }
+
     res.status(201);
-    res.send(response);
+    res.send(invoice);
   } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
