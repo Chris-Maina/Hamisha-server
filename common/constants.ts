@@ -22,6 +22,11 @@ export const CONTRACT_STATUS = {
   CLOSED: 'closed', // job has been completed successfully
 };
 
+export const PAYMENT_STATUS = {
+  RECEIVED: "client payment received",
+  REQUESTED: "payment requested",
+  SENT: "customer payment sent",
+};
 
 export const MESSAGE = 'events/MESSAGE';
 export const JOIN_ROOM = 'events/JOIN_ROOM';
@@ -34,8 +39,7 @@ export const LOAD_MESSAGES_IN_ROOM = 'events/LOAD_MESSAGES_IN_ROOM';
 export const FETCH_MESSAGES_FROM_ROOM = 'events/FETCH_MESSAGES_FROM_ROOM';
 export const FETCH_USER_ROOMS_RESPONSE = 'events/FETCH_USER_ROOMS_RESPONSE';
 
-// Commission is 4%
-export const COMMISSION = 0.04;
+export const COMMISSION = 0.1;
 
 export const MPESA_API = {
   LipaNaMpesa: "LIPA NA M-PESA ONLINE",
