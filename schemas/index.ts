@@ -23,17 +23,14 @@ export const moverRegisterSchema = registerSchema.keys({
 
 export const proposalSchema = Joi.object({
   payment_amount: Joi.number().required(),
-  payment_type: Joi.number().required(),
   job_id: Joi.number().required(),
   mover_id: Joi.number().required(),
 });
 
 export const jobSchema = Joi.object({
-  title: Joi.string().required(),
-  description: Joi.string().required(),
-  payment_amount: Joi.number().required(),
-  expected_duration: Joi.string().required(),
-  payment_type: Joi.number().required()
+  expected_duration: Joi.string().optional(),
+  location: Joi.string().required(),
+  collection_date: Joi.date().required(),
 });
 
 export const contractSchema = Joi.object({
@@ -51,9 +48,16 @@ export const contractSchema = Joi.object({
 });
 
 export const invoiceSchema = Joi.object({
-  description: Joi.string().required(),
-  issued_by: Joi.number().required(),
-  issued_to: Joi.number().required(),
+  issued_by: Joi.number().optional(),
+  issued_to: Joi.number().optional(),
+  contract_id: Joi.number().required(),
+  due_date: Joi.date().optional(),
+  total: Joi.number().required(),
+});
+
+export const paymentSchema = Joi.object({
+  customer_id: Joi.number().required(),
+  mover_id: Joi.number().required(),
   contract_id: Joi.number().required(),
   due_date: Joi.date().optional(),
   total: Joi.number().required(),

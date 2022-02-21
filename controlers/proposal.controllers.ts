@@ -18,7 +18,6 @@ router.get('/', verifyToken, async (req: Request, res: Response, next: NextFunct
         mover: {
           account: true,
         },
-        job_type: true,
         job: req.query.job === "true" ? true : false,
       });
 
@@ -37,7 +36,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const {
       job_id,
       mover_id,
-      payment_type,
       payment_amount,
     } = result;
 
@@ -51,7 +49,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       .insert({
         job_id,
         mover_id,
-        payment_type,
         payment_amount,
         status: PROPOSAL_STATUS.SENT
       })
@@ -60,12 +57,11 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         mover: {
           account: true,
         },
-        job_type: true
       });
 
       res.status(201);
       res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
@@ -89,7 +85,6 @@ router.patch("/:id", verifyToken, async (req: Request, res: Response, next: Next
         mover: {
           account: true,
         },
-        job_type: true
       });
 
     res.status(200);

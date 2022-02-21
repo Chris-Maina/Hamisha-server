@@ -1,17 +1,14 @@
 import { Model } from 'objection';
 import Proposal from './Proposal';
-import PaymentType from './PaymentType';
 import Customer from './Customer';
 
 class Job extends Model {
   id!: number
-  title!: string
+  location!: string
   created_at!: Date
-  payment_type!: number | { name: string }
   expected_duration!: string
-  payment_amount!: number
   customer_id!: number
-  description!: string
+  collection_date!: Date
 
   static get tableName() {
     return "jobs"
@@ -19,15 +16,6 @@ class Job extends Model {
 
   static get relationMappings() {
     return {
-      job_type: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: PaymentType,
-        filter: (query: any) => query.select('id', 'name'),
-        join: {
-          from: 'jobs.payment_type',
-          to: 'payment_types.id'
-        } 
-      },
       customer: {
         relation: Model.BelongsToOneRelation,
         modelClass: Customer,

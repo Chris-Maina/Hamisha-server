@@ -5,6 +5,7 @@ import {
   X509Certificate
  } from "crypto";
 import { readFile } from "fs";
+import { COMMISSION } from "../common/constants";
 
 export interface MpesaToken {
   access_token: string,
@@ -198,4 +199,83 @@ export const urlWithParams = (url: string, params: any): string => {
   });
 
   return url + paramsStr;
+}
+
+export const lipaNaMpesaRequest = async (
+  amount: number,
+  invoiceId: number,
+  contractId: number,
+  recipientUserId: number,
+  senderPhoneNumber: string,
+): Promise<void> => {
+  /**
+     * Check to see if you have mpesa token. You can use Redis here
+     * If yes, proceed with lipa na mpesa api request
+     * if no, generate a new token
+     */
+  const token = await getMpesaAuthToken();
+  const timeStamp = getTimestamp();
+  const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
+  const payload = {
+    "BusinessShortCode": BUSINESS_SHORT_CODE,
+    "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
+    "Timestamp": timeStamp,
+    "TransactionType": "CustomerPayBillOnline",
+    "Amount": amount,
+    "PartyA": senderPhoneNumber, // the MSISDN sending the funds
+    "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
+    "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
+    "CallBackURL": `https://hamisha-api.herokuapp.com/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
+    "AccountReference": "Hamisha", // Identifier of the transaction for CustomerPayBillOnline transaction type
+    "TransactionDesc": `Payment for invoice with id ${invoiceId}`
+  }
+  const options = {
+    host: "sandbox.safaricom.co.ke",
+    path: "/mpesa/stkpush/v1/processrequest",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "https://hamisha-api.herokuapp.com",
+      "Authorization": `Bearer ${token?.access_token}`
+    }
+  }
+
+  await makeApiRequest(options, payload);
+}
+
+export const b2cMpesaRequest = async (
+  amount: number,
+  invoiceId: number,
+  contractId: number,
+  recipientPhoneNumber: string,
+): Promise<void> => {
+  const token = await getMpesaAuthToken();
+  const securityCredentials = await getSecurityCredentials();
+  const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
+
+  // const amountToSend: number = amount - (COMMISSION * amount);
+  // Payload for MPESA request to pay recipient
+  const parameters = {
+    InitiatorName: process.env.MPESA_INITIATOR_NAME,
+    SecurityCredential: securityCredentials,
+    CommandID: "BusinessPayment",
+    Amount: amount,
+    PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
+    PartyB: recipientPhoneNumber,
+    Remarks: "Payment",
+    QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
+    ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
+    Occassion: "pay for service"
+  };
+
+  const options = {
+    host: "sandbox.safaricom.co.ke",
+    path: "/mpesa/b2c/v1/paymentrequest",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token?.access_token}`
+    }
+  }
+  await makeApiRequest(options, parameters);
 }

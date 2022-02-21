@@ -15,11 +15,9 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     const result = await jobSchema.validateAsync(req.body);
 
     const {
-      title,
-      description,
-      payment_amount,
+      collection_date,
       expected_duration,
-      payment_type,
+      location
     } = result;
 
     const customer = await Customer.query().findOne({ user_id: id });
@@ -27,22 +25,17 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
 
     const response = await Job.query()
       .insert({
-        title,
-        description,
+        location,
+        collection_date,
         customer_id: customer.id,
-        payment_type,
-        payment_amount,
         expected_duration,
       })
       .returning(
-        ['id', 'title', 'description', 'created_at', 'expected_duration', 'payment_amount']
-      )
-      .withGraphFetched({
-        job_type: true
-      });
+        ['id', 'location', 'created_at', 'expected_duration', 'collection_date']
+      );
     res.status(201);
     res.send(response);
-  } catch (error) {
+  } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
   }
@@ -54,7 +47,6 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
       .query()
       .orderBy('created_at', 'desc')
       .withGraphFetched({
-        job_type: true,
         proposals: true,
       });
     res.status(200);
@@ -73,7 +65,6 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
       .query()
       .findById(id)
       .withGraphFetched({
-        job_type: true,
         customer: {
           account: true,
         },
@@ -81,7 +72,6 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
           mover: {
             account: true,
           },
-          job_type: true,
           contract: true
         },
       });
@@ -100,11 +90,10 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
       .patch(req.body)
       .where('id', id)
       .returning(
-        ['id', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'created_at', 'expected_duration', 'collection_date']
       )
       .first()
       .withGraphFetched({
-        job_type: true,
         proposals: true,
       });
     res.status(200);
@@ -122,11 +111,10 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
       .update(req.body)
       .where('id', id)
       .returning(
-        ['id', 'description', 'created_at', 'expected_duration', 'payment_amount']
+        ['id', 'location', 'created_at', 'expected_duration', 'collection_date']
       )
       .first()
       .withGraphFetched({
-        job_type: true,
         proposals: true,
       });
     res.status(200);
