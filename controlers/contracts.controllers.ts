@@ -15,18 +15,21 @@ const updateProposalFromContract = async (contract: any): Promise<number | void>
   if (contract.status === CONTRACT_STATUS.ACCEPTED) {
     return await Proposal
       .query()
+      .findById(contract.proposal_id)
       .patch({ status: PROPOSAL_STATUS.JOB_START })
-      .where("id", contract.proposal_id); 
+      .whereNot("status", PROPOSAL_STATUS.JOB_START); 
   } else if (contract.status === CONTRACT_STATUS.DECLINED) {
     return await Proposal
       .query()
+      .findById(contract.proposal_id)
       .patch({ status: PROPOSAL_STATUS.JOB_UNSUCCESS })
-      .where("id", contract.proposal_id);
+      .whereNot("status", PROPOSAL_STATUS.JOB_UNSUCCESS);
   } else if (contract.status === CONTRACT_STATUS.CLOSED) {
     return await Proposal
       .query()
+      .findById(contract.proposal_id)
       .patch({ status: PROPOSAL_STATUS.JOB_SUCCESS })
-      .where("id", contract.proposal_id);
+      .whereNot("status", PROPOSAL_STATUS.JOB_SUCCESS);
   }
   return;
 }
@@ -89,6 +92,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         contractExists.status !== CONTRACT_STATUS.DECLINED
       )
     ) throw new createHttpError.Conflict("A contract exists between shared contacts");
+
     const response = await Contract
       .query()
       .insert(result)
@@ -99,6 +103,8 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         },
         proposal: true,
       });
+
+    updateProposalFromContract(response);
   
     res.status(201);
     res.send(response);
