@@ -17,8 +17,7 @@ router.get('/', verifyToken, async (req: Request, res: Response, next: NextFunct
       .withGraphFetched({
         mover: {
           account: true,
-        },
-        job: req.query.job === "true" ? true : false,
+        }
       });
 
     res.status(200);
