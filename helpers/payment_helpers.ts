@@ -205,8 +205,7 @@ export const lipaNaMpesaRequest = async (
   amount: number,
   invoiceId: number,
   contractId: number,
-  recipientUserId: number,
-  senderPhoneNumber: string,
+  senderPhoneNumber: string
 ): Promise<void> => {
   /**
      * Check to see if you have mpesa token. You can use Redis here
