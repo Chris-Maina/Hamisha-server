@@ -59,7 +59,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const result = await invoiceSchema.validateAsync(req.body);
     const adminUser = await User.query().findOne({ role: USER_TYPES.ADMIN });
     let invoice;
-    if (req.body?.issued_to || result.issued_to) {
+    if (result.issued_to) {
       // Sending an invoice from hamisha/admin to customer
       invoice = await Invoice
         .query()
@@ -72,12 +72,11 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         invoice.total, 
         invoice.id,
         invoice.contract_id,
-        invoice.issued_by,
         invoice.recipient!.phone_number
       );
       console.log(">>>>> Start >>>>>");
     }
-    if (req.body?.issued_by || result.issued_by) {
+    if (result.issued_by) {
       // Sending an invoice from mover to hamisha/admin
       invoice = await Invoice
         .query()
