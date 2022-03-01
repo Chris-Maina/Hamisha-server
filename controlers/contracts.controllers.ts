@@ -101,6 +101,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         mover: {
           account: true
         },
+        customer: true,
         proposal: true,
       });
 
@@ -128,6 +129,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
         mover: {
           account: true
         },
+        customer: true,
         proposal: true,
       });
 
@@ -154,6 +156,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         mover: {
           account: true
         },
+        customer: true,
         proposal: true,
       });
 
