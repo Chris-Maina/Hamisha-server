@@ -60,14 +60,28 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const adminUser = await User.query().findOne({ role: USER_TYPES.ADMIN });
     let invoice;
     if (result.issued_to) {
+      // Check for an invoice for the parties involved
+      const existingInvoice = await Invoice.query().findOne({
+        issued_to: result.issued_to,
+        issued_by: adminUser.id,
+        contract_id: result.contract_id
+      });
+
+      if (existingInvoice) throw new createHttpError.Conflict("An exist an invoice for your payment. Don't send payment");
+
       // Sending an invoice from hamisha/admin to customer
       invoice = await Invoice
         .query()
-        .insert({ ...result, issued_by: adminUser.id })
+        .insert({ 
+          ...result,
+          issued_by: adminUser.id,
+          description: `User ${result.issued_to} pay ksh ${result.total}`
+        })
         .returning(['id', 'contract_id', 'issued_by'])
         .withGraphFetched({
           recipient: true,
       });
+      console.log(">>>>> Invoice created >>>>>", invoice);
       await lipaNaMpesaRequest(
         invoice.total, 
         invoice.id,
@@ -77,10 +91,24 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       console.log(">>>>> Start >>>>>");
     }
     if (result.issued_by) {
+
+      // Check for an invoice for the parties involved
+      const existingInvoice = await Invoice.query().findOne({
+        issued_by: result.issued_by,
+        issued_to: adminUser.id,
+        contract_id: result.contract_id
+      });
+
+      if (existingInvoice) throw new createHttpError.Conflict("An exist an invoice for your payment. Don't send payment");
+
       // Sending an invoice from mover to hamisha/admin
       invoice = await Invoice
         .query()
-        .insert({ ...result, issued_to: adminUser.id })
+        .insert({ 
+          ...result,
+          issued_to: adminUser.id,
+          description: `Admin pay user with id ${result.issued_by} ksh ${result.total}`
+        })
         .returning(['id', 'contract_id', 'issued_by'])
         .withGraphFetched({
           creator: true,
