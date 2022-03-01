@@ -206,7 +206,7 @@ export const lipaNaMpesaRequest = async (
   invoiceId: number,
   contractId: number,
   senderPhoneNumber: string
-): Promise<void> => {
+): Promise<void | unknown> => {
   /**
      * Check to see if you have mpesa token. You can use Redis here
      * If yes, proceed with lipa na mpesa api request
@@ -239,7 +239,7 @@ export const lipaNaMpesaRequest = async (
     }
   }
 
-  await makeApiRequest(options, payload);
+  return await makeApiRequest(options, payload);
 }
 
 export const b2cMpesaRequest = async (
