@@ -75,13 +75,12 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         .insert({ 
           ...result,
           issued_by: adminUser.id,
-          description: `User ${result.issued_to} pay ksh ${result.total}`
+          description: `User with id ${result.issued_to} pay ksh ${result.total}`
         })
         .returning(['id', 'contract_id', 'issued_by'])
         .withGraphFetched({
           recipient: true,
-      });
-      console.log(">>>>> Invoice created >>>>>", invoice);
+        });
       await lipaNaMpesaRequest(
         invoice.total, 
         invoice.id,
