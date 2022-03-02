@@ -57,6 +57,7 @@ class Invoice extends Model {
       payment: {
         relation: Model.HasOneRelation,
         modelClass: Payment,
+        filter: (query: any) => query.select('mpesa_receipt_no', 'status'),
         join: {
           from: "invoices.id",
           to: "payments.invoice_id"
