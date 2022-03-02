@@ -55,6 +55,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
           mover: {
             account: true
           },
+          customer: true,
           proposal: true,
         });
     } else {
