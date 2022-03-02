@@ -67,7 +67,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         contract_id: result.contract_id
       });
 
-      if (existingInvoice) throw new createHttpError.Conflict("An exist an invoice for your payment. Don't send payment");
+      if (existingInvoice) throw new createHttpError.Conflict("An invoice exists for your payment. Don't send payment");
 
       // Sending an invoice from hamisha/admin to customer
       invoice = await Invoice
@@ -98,7 +98,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         contract_id: result.contract_id
       });
 
-      if (existingInvoice) throw new createHttpError.Conflict("An exist an invoice for your payment. Don't send payment");
+      if (existingInvoice) throw new createHttpError.Conflict("An invoice exists for your payment. Don't send payment");
 
       // Sending an invoice from mover to hamisha/admin
       invoice = await Invoice
