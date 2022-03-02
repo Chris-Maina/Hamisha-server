@@ -44,7 +44,7 @@ class Contract extends Model {
           to: "proposals.id"
         },
       },
-      invoice: {
+      invoices: {
         relation: Model.HasManyRelation,
         modelClass: Invoice,
         filter: (query: any) => query.select('id'),
