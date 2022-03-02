@@ -196,7 +196,9 @@ router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
           account: true
         },
         proposal: true,
-        invoices: true
+        invoices: {
+          payment: true
+        }
       });
 
     res.status(200);
