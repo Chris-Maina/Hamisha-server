@@ -57,7 +57,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       "TransactionDesc": `Payment for invoice with id ${invoice.id}`
     }
     const options = {
-      host: "sandbox.safaricom.co.ke",
+      hostname: "sandbox.safaricom.co.ke",
       path: "/mpesa/stkpush/v1/processrequest",
       method: "POST",
       headers: {
@@ -181,7 +181,7 @@ router.post("/sendtorecipient", async (req: Request, res: Response, next: NextFu
     };
 
     const options = {
-      host: "sandbox.safaricom.co.ke",
+      hostname: "sandbox.safaricom.co.ke",
       path: "/mpesa/b2c/v1/paymentrequest",
       method: "POST",
       headers: {

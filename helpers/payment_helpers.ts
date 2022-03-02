@@ -13,7 +13,7 @@ export interface MpesaToken {
 }
 
 interface optionsDef {
-  host: string,
+  hostname: string,
   path: string,
   port?: number,
   method?: string,
@@ -30,7 +30,7 @@ interface optionsDef {
 export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
 
   return new Promise((resolve, reject) => {
-    const callback = function (response: any) {
+    const callback = (response: any) => {
       let output = "";
       response.setEncoding('utf8');
 
@@ -45,10 +45,10 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
       response.on('end', function () {
         try {
           output = output && JSON.parse(output);
+          resolve(output);
         } catch (error) {
           reject(error);
         }
-        resolve(output);
       });
     }
 
@@ -71,7 +71,7 @@ export const getMpesaAuthToken = async (): Promise<any> => {
   const encodedConsumerKeyAndSecret = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
 
   const options = {
-    host: "sandbox.safaricom.co.ke",
+    hostname: "sandbox.safaricom.co.ke",
     path: "/oauth/v1/generate?grant_type=client_credentials",
     method: "GET",
     headers: {
@@ -229,7 +229,7 @@ export const lipaNaMpesaRequest = async (
     "TransactionDesc": `Payment for invoice with id ${invoiceId}`
   }
   const options = {
-    host: "sandbox.safaricom.co.ke",
+    hostname: "sandbox.safaricom.co.ke",
     path: "/mpesa/stkpush/v1/processrequest",
     method: "POST",
     headers: {
@@ -268,7 +268,7 @@ export const b2cMpesaRequest = async (
   };
 
   const options = {
-    host: "sandbox.safaricom.co.ke",
+    hostname: "sandbox.safaricom.co.ke",
     path: "/mpesa/b2c/v1/paymentrequest",
     method: "POST",
     headers: {
