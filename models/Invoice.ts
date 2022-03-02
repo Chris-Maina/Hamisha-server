@@ -29,7 +29,7 @@ class Invoice extends Model {
        creator: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
-        filter: (query: any) => query.select('id', 'first_name', 'last_name'),
+        filter: (query: any) => query.select('id', 'first_name', 'last_name', 'phone_number'),
         join: {
           from: "invoices.issued_by",
           to: "users.id"
