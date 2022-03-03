@@ -87,7 +87,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         invoice.contract_id,
         invoice.recipient!.phone_number
       );
-      console.log(">>>>> Start >>>>>");
     }
     if (result.issued_by) {
 
@@ -101,10 +100,13 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       if (existingInvoice) throw new createHttpError.Conflict("An invoice exists for your payment. Don't send payment");
 
       // Sending an invoice from mover to hamisha/admin
+      // const amountToSend: number = result.total - (COMMISSION * result.total);
+      // const amountToSend: number = 1;
       invoice = await Invoice
         .query()
         .insert({ 
           ...result,
+          // total: amountToSend
           issued_to: adminUser.id,
           description: `Admin pay user with id ${result.issued_by} ksh ${result.total}`
         })
