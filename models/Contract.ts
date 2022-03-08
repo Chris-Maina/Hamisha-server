@@ -38,7 +38,7 @@ class Contract extends Model {
       proposal: {
         relation: Model.BelongsToOneRelation,
         modelClass: Proposal,
-        filter: (query: any) => query.select('id', 'customer_comment', 'movers_comment', 'payment_amount', 'payment_type'),
+        filter: (query: any) => query.select('id', 'customer_comment', 'movers_comment', 'payment_amount', 'job_id'),
         join: {
           from: "contracts.proposal_id",
           to: "proposals.id"
