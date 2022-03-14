@@ -24,3 +24,9 @@ export type S3UploadedObject = {
   Bucket: string,
   Key: string
 }
+
+export enum JOB_STATUS {
+  ACTIVE = 'active', // hiring
+  INPROGRESS = 'inprogress', // Hired someone
+  COMPLETED = "completed" // mover paid
+}
