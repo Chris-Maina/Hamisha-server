@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+import Contract from './Contract';
 import User from './User';
 import Vehicle from './Vehicle';
 
@@ -31,6 +32,14 @@ class Mover extends Model {
         join: {
           from: "movers.id",
           to: "vehicles.mover_id"
+        }
+      },
+      contracts: {
+        relation: Model.HasManyRelation,
+        modelClass: Contract,
+        join: {
+          from: "movers.id",
+          to: "contracts.mover_id"
         }
       }
     }

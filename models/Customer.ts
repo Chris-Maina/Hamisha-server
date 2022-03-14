@@ -1,4 +1,6 @@
 import { Model } from 'objection';
+import Contract from './Contract';
+import Job from './Job';
 import User from './User';
 
 class Customer extends Model {
@@ -20,6 +22,22 @@ class Customer extends Model {
         join: {
           from: 'customers.user_id',
           to: 'users.id'
+        }
+      },
+      jobs: {
+        relation: Model.HasManyRelation,
+        modelClass: Job,
+        join: {
+          from: 'customers.id',
+          to: "jobs.customer_id"
+        }
+      },
+      contracts: {
+        relation: Model.HasManyRelation,
+        modelClass: Contract,
+        join: {
+          from: "customers.id",
+          to: "contracts.customer_id"
         }
       }
     }

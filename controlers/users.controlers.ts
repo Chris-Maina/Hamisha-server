@@ -26,9 +26,13 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
       .findById(id)
       .select('id', 'first_name', 'last_name', 'email', 'phone_number')
       .withGraphFetched({
-        customer: true,
+        customer: {
+          contracts: true,
+          jobs: true
+        },
         mover: {
-          vehicles: true
+          vehicles: true,
+          contracts: true
         }
       });
 
