@@ -32,7 +32,8 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
         },
         mover: {
           vehicles: true,
-          contracts: true
+          contracts: true,
+          proposals: true
         }
       });
 
