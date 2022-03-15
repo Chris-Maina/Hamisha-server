@@ -1,35 +1,40 @@
 import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
-import { Contract, Proposal, User } from "../models";
+import {
+  Contract,
+  Job,
+  Proposal,
+  User
+} from "../models";
 import { contractSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { CONTRACT_STATUS, PROPOSAL_STATUS } from "../common/constants";
-import { RequestWithPayload } from "../common/interfaces";
+import { CONTRACT_STATUS } from "../common/constants";
+import { JOB_STATUS, RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
 const contractFields: string[] = [
   'id', 'start_time', 'title', 'status', 'proposal_id', 'mover_id'
 ];
 
-const updateProposalFromContract = async (contract: any): Promise<number | void> => {
-  if (contract.status === CONTRACT_STATUS.ACCEPTED) {
-    return await Proposal
+const updateProposalFromContract = async (contract: any): Promise<number | void | unknown []> => {
+  if (contract.status === CONTRACT_STATUS.DECLINED) {
+    const proposal = await Proposal
       .query()
-      .findById(contract.proposal_id)
-      .patch({ status: PROPOSAL_STATUS.JOB_START })
-      .whereNot("status", PROPOSAL_STATUS.JOB_START); 
-  } else if (contract.status === CONTRACT_STATUS.DECLINED) {
-    return await Proposal
+      .findById(contract.proposal_id);
+    return Job
       .query()
-      .findById(contract.proposal_id)
-      .patch({ status: PROPOSAL_STATUS.JOB_UNSUCCESS })
-      .whereNot("status", PROPOSAL_STATUS.JOB_UNSUCCESS);
+      .findById(proposal.job_id)
+      .patch({ status: JOB_STATUS.COMPLETED })
+      .whereNot('status', JOB_STATUS.COMPLETED);
   } else if (contract.status === CONTRACT_STATUS.CLOSED) {
-    return await Proposal
+    const proposal = await Proposal
       .query()
-      .findById(contract.proposal_id)
-      .patch({ status: PROPOSAL_STATUS.JOB_SUCCESS })
-      .whereNot("status", PROPOSAL_STATUS.JOB_SUCCESS);
+      .findById(contract.proposal_id);
+    return await Job
+      .query()
+      .findById(proposal.job_id)
+      .patch({ status: JOB_STATUS.COMPLETED })
+      .whereNot('status', JOB_STATUS.COMPLETED);
   }
   return;
 }
@@ -86,6 +91,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const contractExists: any = await Contract.query().findOne({
       customer_id: result.customer_id,
       mover_id: result.mover_id,
+      proposal_id: result.proposal_id
     });
     if (contractExists
       && (
