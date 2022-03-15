@@ -9,6 +9,7 @@ class Job extends Model {
   expected_duration!: string
   customer_id!: number
   collection_date!: Date
+  status!: string
 
   static get tableName() {
     return "jobs"

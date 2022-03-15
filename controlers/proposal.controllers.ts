@@ -1,9 +1,9 @@
 import createHttpError from "http-errors";
 import { NextFunction, Response, Router, Request } from "express";
 
-import { Proposal } from "../models";
+import { Job, Proposal } from "../models";
 import { proposalSchema } from "../schemas";
-import { ProposalAttr } from "../common/interfaces";
+import { JOB_STATUS, ProposalAttr } from "../common/interfaces";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { PROPOSAL_STATUS } from "../common/constants";
 
@@ -73,18 +73,37 @@ router.patch("/:id", verifyToken, async (req: Request, res: Response, next: Next
     const proposal = await Proposal.query().findById(id);
     if (!proposal) throw new createHttpError.NotFound("Proposal does not exist");
 
+    let response: any;
     // Update
-    const response: any = await Proposal
-      .query()
-      .patch(req.body)
-      .where("id", id)
-      .returning(PROPOSAL_FIELDS)
-      .first()
-      .withGraphFetched({
-        mover: {
-          account: true,
-        },
-      });
+    if (req.body.status === PROPOSAL_STATUS.ACCEPTED && proposal.status !== PROPOSAL_STATUS.ACCEPTED) {
+      const promiseArray = await Promise.all([
+        Proposal
+          .query()
+          .patch(req.body)
+          .where("id", id)
+          .returning(PROPOSAL_FIELDS)
+          .first()
+          .withGraphFetched({
+            mover: {
+              account: true,
+            },
+          }),
+        Job.query().patch({ status: JOB_STATUS.INPROGRESS }).where("id", proposal.job_id)
+      ]);
+      response = promiseArray[0];
+    } else {
+      response = await Proposal
+        .query()
+        .patch(req.body)
+        .where("id", id)
+        .returning(PROPOSAL_FIELDS)
+        .first()
+        .withGraphFetched({
+          mover: {
+            account: true,
+          },
+        });
+    }
 
     res.status(200);
     res.send(response);
