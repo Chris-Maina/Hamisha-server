@@ -16,7 +16,7 @@ const contractFields: string[] = [
   'id', 'start_time', 'title', 'status', 'proposal_id', 'mover_id'
 ];
 
-const updateProposalFromContract = async (contract: any): Promise<number | void | unknown []> => {
+const updateJobFromContract = async (contract: any): Promise<number | void | unknown []> => {
   if (contract.status === CONTRACT_STATUS.DECLINED) {
     const proposal = await Proposal
       .query()
@@ -112,7 +112,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         proposal: true,
       });
 
-    updateProposalFromContract(response);
+    updateJobFromContract(response);
   
     res.status(201);
     res.send(response);
@@ -140,7 +140,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
         proposal: true,
       });
 
-    updateProposalFromContract(response);
+    updateJobFromContract(response);
     
     res.status(200);
     res.send(response);
@@ -167,7 +167,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         proposal: true,
       });
 
-    updateProposalFromContract(response);
+    updateJobFromContract(response);
 
     res.status(200);
     res.send(response);
