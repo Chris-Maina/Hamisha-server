@@ -21,7 +21,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         customer: true,
       });
 
-    if (!user) new createHttpError.NotFound("User is not registered");
+    if (!user) new createHttpError.NotFound("User is not registered. Register as new user");
 
     if (user.customer) {
       // Get bills issued to customer
