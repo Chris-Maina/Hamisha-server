@@ -128,6 +128,9 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
   try {
     const { id } = req.params;
 
+    const contract = await Contract.query().findById(id);
+    if (!contract) return new createHttpError.NotFound("Contract does not exist. Create one");
+
     const response: any = await Contract
       .query()
       .patch(req.body)
@@ -154,6 +157,9 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
 router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    const contract = await Contract.query().findById(id);
+    if (!contract) return new createHttpError.NotFound("Contract does not exist. Create one");
 
     const response = await Contract
       .query()
@@ -208,6 +214,8 @@ router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
           payment: true
         }
       });
+
+    if (!response) return new createHttpError.NotFound("Contract does not exist. Create one");
 
     res.status(200);
     res.send(response);
