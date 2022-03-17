@@ -31,7 +31,7 @@ class Proposal extends Model {
       job: {
         relation: Model.BelongsToOneRelation,
         modelClass: Job,
-        filter: (query: any) => query.select('id', 'title'),
+        filter: (query: any) => query.select('id', 'location', 'customer_id'),
         join: {
           from: "proposals.job_id",
           to: "jobs.id"
