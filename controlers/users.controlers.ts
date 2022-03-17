@@ -43,7 +43,7 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
         }
       });
 
-    if (!response) return new createHttpError.NotFound("User does not exist");
+    if (!response) throw new createHttpError.NotFound("User does not exist");
 
     res.status(200);
     res.send(response)
@@ -57,7 +57,7 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
     const { id } = req.params;
 
     const user = await User.query().findById(id);
-    if (!user) return new createHttpError.NotFound("User does not exist.");
+    if (!user) throw new createHttpError.NotFound("User does not exist.");
 
     const response = await User
       .query()
@@ -99,7 +99,7 @@ router.patch('/movers/:id', verifyToken, async (req: Request, res: Response, nex
     const { id } = req.params;
     
     const mover = await Mover.query().findById(id);
-    if (!mover) return new createHttpError.NotFound("User does not exist. Register as a collector");
+    if (!mover) throw new createHttpError.NotFound("User does not exist. Register as a collector");
 
     const response = await Mover
       .query()
@@ -119,7 +119,7 @@ router.patch('/customers/:id', verifyToken, async (req: Request, res: Response, 
     const { id } = req.params;
 
     const customer = await Customer.query().findById(id);
-    if (!customer) return new createHttpError.NotFound("User does not exist. Register as a landlord");
+    if (!customer) throw new createHttpError.NotFound("User does not exist. Register as a landlord");
 
     const response = await Customer
       .query()
@@ -141,7 +141,7 @@ router.get('/customers/:id/jobs', verifyToken, async (req: Request, res: Respons
   try {
 
     const customer = await Customer.query().findById(req.params.id);
-    if (!customer) return new createHttpError.NotFound("User does not exist. Register as a landlord.");
+    if (!customer) throw new createHttpError.NotFound("User does not exist. Register as a landlord.");
 
     const response: any = await Job
       .query()

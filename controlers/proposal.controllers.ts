@@ -15,7 +15,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
     const { id } = req.payload;
     const mover = await Mover.query().findOne({ user_id: id });
 
-    if (!mover) return new createHttpError.Unauthorized("Please login to access resource")
+    if (!mover) throw new createHttpError.Unauthorized("Please login to access resource")
     const response = await Proposal
       .query()
       .where("mover_id", mover.id)

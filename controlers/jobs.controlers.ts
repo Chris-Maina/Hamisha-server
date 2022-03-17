@@ -20,7 +20,7 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     } = result;
 
     const customer = await Customer.query().findOne({ user_id: id });
-    if (!customer) throw new createHttpError.NotFound('Register as a customer to create jobs');
+    if (!customer) throw new createHttpError.NotFound('Register as a landlord to create requests');
 
     const response = await Job.query()
       .insert({
@@ -74,7 +74,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         },
       });
     
-    if (!response) return new createHttpError.NotFound("Job does not exist.");
+    if (!response) throw new createHttpError.NotFound("Job does not exist.");
 
     res.status(200);
     res.send(response);
@@ -88,7 +88,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
     const { id } = req.params;
 
     const job = await Job.query().findById(id);
-    if (!job) return new createHttpError.NotFound("Job does not exist.");
+    if (!job) throw new createHttpError.NotFound("Job does not exist.");
 
     const response = await Job.query()
       .patch(req.body)
@@ -112,7 +112,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
     const { id } = req.params;
 
     const job = await Job.query().findById(id);
-    if (!job) return new createHttpError.NotFound("Job does not exist.");
+    if (!job) throw new createHttpError.NotFound("Job does not exist.");
 
     const response = await Job.query()
       .update(req.body)

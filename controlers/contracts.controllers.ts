@@ -50,7 +50,7 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         customer: true,
       });
 
-    if (!user) new createHttpError.NotFound("User is not registered. Register as new user");
+    if (!user) throw new createHttpError.NotFound("User is not registered. Register as new user");
 
     let response = null;
     if (user.customer) {
@@ -129,7 +129,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
     const { id } = req.params;
 
     const contract = await Contract.query().findById(id);
-    if (!contract) return new createHttpError.NotFound("Contract does not exist. Create one");
+    if (!contract) throw new createHttpError.NotFound("Contract does not exist. Create one");
 
     const response: any = await Contract
       .query()
@@ -159,7 +159,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
     const { id } = req.params;
 
     const contract = await Contract.query().findById(id);
-    if (!contract) return new createHttpError.NotFound("Contract does not exist. Create one");
+    if (!contract) throw new createHttpError.NotFound("Contract does not exist. Create one");
 
     const response = await Contract
       .query()
@@ -215,7 +215,7 @@ router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         }
       });
 
-    if (!response) return new createHttpError.NotFound("Contract does not exist. Create one");
+    if (!response) throw new createHttpError.NotFound("Contract does not exist. Create one");
 
     res.status(200);
     res.send(response);
