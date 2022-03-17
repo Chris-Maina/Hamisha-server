@@ -21,6 +21,8 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         customer: true,
       });
 
+    if (!user) new createHttpError.NotFound("User is not registered");
+
     if (user.customer) {
       // Get bills issued to customer
       response = await Invoice
