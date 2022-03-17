@@ -84,10 +84,14 @@ router.post('/b2c/timeout', async (req: Request, res: Response, next: NextFuncti
 router.patch('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    const payment = Payment.query().findById(id);
+    if (!payment) throw new createHttpError.NotFound("Payment does not exist");
+
     const response = await Payment
       .query()
       .patch(req.body)
-      .findById(id);
+      .returning("*");
 
     res.status(200);
     res.send(response);
