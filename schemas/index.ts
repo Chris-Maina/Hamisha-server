@@ -28,7 +28,6 @@ export const proposalSchema = Joi.object({
 });
 
 export const jobSchema = Joi.object({
-  expected_duration: Joi.string().optional(),
   location: Joi.string().required(),
   collection_date: Joi.date().required(),
 });

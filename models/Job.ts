@@ -6,7 +6,6 @@ class Job extends Model {
   id!: number
   location!: string
   created_at!: Date
-  expected_duration!: string
   customer_id!: number
   collection_date!: Date
   status!: string
