@@ -1,4 +1,10 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { 
+  Router,
+  Request,
+  Response,
+  NextFunction
+} from 'express';
+import createHttpError from 'http-errors';
 
 import { Mover, Job, User, Customer } from '../models';
 import { verifyToken } from '../helpers/jwt_helpers';
@@ -37,6 +43,8 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
         }
       });
 
+    if (!response) return new createHttpError.NotFound("User does not exist");
+
     res.status(200);
     res.send(response)
   } catch (error) {
@@ -47,6 +55,10 @@ router.get('/users/:id', verifyToken, async (req: Request, res: Response, next: 
 router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    const user = await User.query().findById(id);
+    if (!user) return new createHttpError.NotFound("User does not exist.");
+
     const response = await User
       .query()
       .patch(req.body)
@@ -85,14 +97,15 @@ router.get('/movers', async (_req: Request, res: Response, next: NextFunction) =
 router.patch('/movers/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+    
+    const mover = await Mover.query().findById(id);
+    if (!mover) return new createHttpError.NotFound("User does not exist. Register as a collector");
+
     const response = await Mover
       .query()
       .patch(req.body)
       .where('id', id)
       .returning('*')
-      // .withGraphFetched({
-      //   account: true
-      // });
 
     res.status(200);
     res.send(response[0])
@@ -104,6 +117,10 @@ router.patch('/movers/:id', verifyToken, async (req: Request, res: Response, nex
 router.patch('/customers/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    const customer = await Customer.query().findById(id);
+    if (!customer) return new createHttpError.NotFound("User does not exist. Register as a landlord");
+
     const response = await Customer
       .query()
       .patch(req.body)
@@ -122,6 +139,10 @@ router.patch('/customers/:id', verifyToken, async (req: Request, res: Response, 
 
 router.get('/customers/:id/jobs', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
+
+    const customer = await Customer.query().findById(req.params.id);
+    if (!customer) return new createHttpError.NotFound("User does not exist. Register as a landlord.");
+
     const response: any = await Job
       .query()
       .where({ customer_id: parseInt(req.params.id, 10) })
