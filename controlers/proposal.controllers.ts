@@ -14,10 +14,12 @@ router.get('/', verifyToken, async (req: Request, res: Response, next: NextFunct
   try {
     const response = await Proposal
       .query()
+      .orderBy('created_at', 'desc')
       .withGraphFetched({
         mover: {
           account: true,
-        }
+        },
+        job: true
       });
 
     res.status(200);
