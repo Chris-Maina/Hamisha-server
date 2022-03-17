@@ -49,8 +49,10 @@ router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next
         mover: true,
         customer: true,
       });
-    let response = null;
 
+    if (!user) new createHttpError.NotFound("User is not registered. Register as new user");
+
+    let response = null;
     if (user.customer) {
       response = await Contract
         .query()
