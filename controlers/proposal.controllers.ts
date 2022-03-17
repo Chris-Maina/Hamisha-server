@@ -1,19 +1,24 @@
 import createHttpError from "http-errors";
 import { NextFunction, Response, Router, Request } from "express";
 
-import { Job, Proposal } from "../models";
+import { Job, Mover, Proposal } from "../models";
 import { proposalSchema } from "../schemas";
-import { JOB_STATUS, ProposalAttr } from "../common/interfaces";
+import { JOB_STATUS, ProposalAttr, RequestWithPayload } from "../common/interfaces";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { PROPOSAL_STATUS } from "../common/constants";
 
 const router = Router();
 const PROPOSAL_FIELDS = ['id', 'status', 'payment_amount', 'created_at', 'mover_id', 'payment_type'];
 
-router.get('/', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
+router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
+    const { id } = req.payload;
+    const mover = await Mover.query().findOne({ user_id: id });
+
+    if (!mover) return new createHttpError.Unauthorized("Please login to access resource")
     const response = await Proposal
       .query()
+      .where("mover_id", mover.id)
       .orderBy('created_at', 'desc')
       .withGraphFetched({
         mover: {
