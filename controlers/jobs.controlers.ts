@@ -73,6 +73,9 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
           contract: true
         },
       });
+    
+    if (!response) return new createHttpError.NotFound("Job does not exist.");
+
     res.status(200);
     res.send(response);
   } catch (error) {
@@ -84,9 +87,12 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
   try {
     const { id } = req.params;
 
+    const job = await Job.query().findById(id);
+    if (!job) return new createHttpError.NotFound("Job does not exist.");
+
     const response = await Job.query()
       .patch(req.body)
-      .where('id', id)
+      .where('id', job.id)
       .returning(
         ['id', 'location', 'created_at', 'collection_date']
       )
@@ -104,6 +110,9 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
 router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+
+    const job = await Job.query().findById(id);
+    if (!job) return new createHttpError.NotFound("Job does not exist.");
 
     const response = await Job.query()
       .update(req.body)
