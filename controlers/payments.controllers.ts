@@ -30,10 +30,10 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const contractId = parseInt(contract_id as string, 10);
     await Contract
     .query()
+    .findById(contractId)
     .patch({
       status: CONTRACT_STATUS.ACCEPTED 
-    })
-    .findById(contractId);
+    });
 
     // respond to safaricom servers with a success message
     res.json({
