@@ -17,7 +17,7 @@ API to facilitate frontend app and help property owners and landlords get garbag
 ```bash
 brew install git
 ```
-2. Install node version manager, NVM
+2. Install node version manager, [nvm](https://github.com/nvm-sh/nvm)
 3. Install node version 16.x.x and start using it
 ```bash
 nvm install 16.13.1
@@ -46,22 +46,22 @@ yarn dev
 ```
 Access the endpoints using your preferred client e.g. Postman
 
-| Endpoint            | Methods  | Requires token  |
-|---------------------|---------|-------------|
-| /api/register       | POST    | FALSE |
-| /api/login          | POST    | FALSE |
-| /api/refresh-token  | GET     | FALSE |
-| /profile            | GET     | TRUE  |
-| /users/:id          | GET     | TRUE  |
-| /users/:id          | PATCH   | TRUE  |
-| /jobs               | GET     | FALSE |
-| /jobs               | POST    | TRUE  |
-| /jobs/:id           | PATCH   | TRUE  |
-| /jobs/:id           | DELETE  | TRUE  |
-| /proposals          | GET     | TRUE  |
-| /proposals          | POST    | TRUE  |
-| /proposals/:id      | PATCH   | TRUE  |
-| /contracts          | GET     | TRUE  |
-| /contracts          | POST    | TRUE  |
-| /contracts/:id      | PATCH   | TRUE  |
-| /contracts/:id      | GET     | TRUE  |
+| Endpoint                | Methods | Requires token|
+|-------------------------|---------|---------------|
+| /api/register           | POST    | FALSE         |
+| /api/login              | POST    | FALSE         |
+| /api/refresh-token      | GET     | FALSE         |
+| /api/profile            | GET     | TRUE          |
+| /api/users/:id          | GET     | TRUE          |
+| /api/users/:id          | PATCH   | TRUE          |
+| /api/jobs               | GET     | FALSE         |
+| /api/jobs               | POST    | TRUE          |
+| /api/jobs/:id           | PATCH   | TRUE          |
+| /api/jobs/:id           | DELETE  | TRUE          |
+| /api/proposals          | GET     | TRUE          |
+| /api/proposals          | POST    | TRUE          |
+| /api/proposals/:id      | PATCH   | TRUE          |
+| /api/contracts          | GET     | TRUE          |
+| /api/contracts          | POST    | TRUE          |
+| /api/contracts/:id      | PATCH   | TRUE          |
+| /api/contracts/:id      | GET     | TRUE          |
