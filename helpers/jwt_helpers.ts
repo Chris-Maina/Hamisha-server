@@ -12,7 +12,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'REFRESH SECRET KEY
  * @param {Number} userId
  * @returns {Promise}
  */
-export const generateToken = (userId: Number): Promise<any | HttpError> => {
+export const generateToken = (userId: Number): Promise<string | undefined | HttpError> => {
   const payload = { id: userId };
   const options = {
     expiresIn: '15m'
@@ -55,7 +55,7 @@ export const verifyToken = (req: RequestWithPayload, _res: Response, next: NextF
  * @param {Response} response
  * @returns {Promise}
  */
-export const generateRefreshToken = (userId: Number, response: Response): Promise<any | HttpError> => {
+export const generateRefreshToken = (userId: Number, response: Response): Promise<string | undefined | HttpError> => {
   const payload = { id: userId };
   const options = {
     expiresIn: '3d'
