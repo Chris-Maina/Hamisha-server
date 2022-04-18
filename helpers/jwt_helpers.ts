@@ -37,11 +37,10 @@ export const verifyToken = (req: RequestWithPayload, _res: Response, next: NextF
   const token = authHeader[1];
   JWT.verify(token, JWT_SECRET, (err, payload) => {
     if (err) {
-      if (err.name === 'JsonWebTokenError') {
-        return next(new createHttpError.Unauthorized());
-      } else {
-        return next(new createHttpError.Unauthorized(err.message));
-      }
+      return next(createHttpError(401, {
+        name: err.name,
+        message: "Unauthorized. Login to get valid token!!."
+      }));
     }
 
     req.payload = payload;
@@ -84,7 +83,12 @@ export const generateRefreshToken = (userId: Number, response: Response): Promis
 export const verifyRefreshToken = (token: string): Promise<any | HttpError> => {
   return new Promise ((resolve, reject) => {
     JWT.verify(token, JWT_REFRESH_SECRET, (err, payload: any) => {
-      if (err) reject(new createHttpError.BadRequest());
+      if (err) reject(
+        createHttpError(401, {
+          name: err.name,
+          message: "Unauthorized. Login to get valid token."
+        })
+      );
       resolve(payload);
     });
   });
