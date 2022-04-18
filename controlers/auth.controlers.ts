@@ -145,9 +145,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       last_name: user.last_name,
       customer: user.customer,
       mover: user.mover,
-      rooms: user.rooms,
       access_token: token,
-      phone_number: user.phone_number,
     });
   } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest('Provide a valid email/password.'));
@@ -158,10 +156,10 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
 router.get('/refresh-token', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cookieArr = req.headers.cookie?.split('=');
-    if (!cookieArr) throw new createHttpError.NotFound('Token not available');
+    if (!cookieArr) throw new createHttpError.NotFound('Token unavailable. Please login');
 
     const refreshTokenIndex = cookieArr.findIndex(el => el.includes('refreshToken'));
-    if (refreshTokenIndex === -1) throw new createHttpError.NotFound('Token not available');
+    if (refreshTokenIndex === -1) throw new createHttpError.NotFound('Token unavailable. Please login');
     const refresh_token = cookieArr[refreshTokenIndex + 1];
     const payload = await verifyRefreshToken(refresh_token);
 
