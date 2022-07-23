@@ -7,7 +7,7 @@ import { verifyToken } from '../helpers/jwt_helpers';
 import { RequestWithPayload } from '../common/interfaces';
 
 const router = Router();
-
+const JobReturningFields: string[] = ['id', 'location', 'created_at', 'collection_day', 'end_date', 'start_date', 'quantity'];
 router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
     const { id } = req.payload;
@@ -15,8 +15,11 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     const result = await jobSchema.validateAsync(req.body);
 
     const {
-      collection_date,
-      location
+      collection_day,
+      location,
+      start_date,
+      end_date,
+      quantity
     } = result;
 
     const customer = await Customer.query().findOne({ user_id: id });
@@ -25,12 +28,13 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
     const response = await Job.query()
       .insert({
         location,
-        collection_date,
+        quantity,
+        end_date,
+        start_date,
+        collection_day,
         customer_id: customer.id,
       })
-      .returning(
-        ['id', 'location', 'created_at', 'collection_date']
-      );
+      .returning(JobReturningFields);
     res.status(201);
     res.send(response);
   } catch (error: any) {
@@ -93,9 +97,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
     const response = await Job.query()
       .patch(req.body)
       .where('id', job.id)
-      .returning(
-        ['id', 'location', 'created_at', 'collection_date']
-      )
+      .returning(JobReturningFields)
       .first()
       .withGraphFetched({
         proposals: true,
@@ -117,9 +119,7 @@ router.put('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
     const response = await Job.query()
       .update(req.body)
       .where('id', id)
-      .returning(
-        ['id', 'location', 'created_at', 'collection_date']
-      )
+      .returning(JobReturningFields)
       .first()
       .withGraphFetched({
         proposals: true,
