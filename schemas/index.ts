@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { CONTRACT_STATUS } from '../common/constants';
+import { CONTRACT_STATUS, DAYS_OF_THE_WEEK } from '../common/constants';
 
 export const loginSchema = Joi.object({
   email: Joi.string().email().lowercase().required(),
@@ -28,8 +28,11 @@ export const proposalSchema = Joi.object({
 });
 
 export const jobSchema = Joi.object({
+  quantity: Joi.number().required(),
   location: Joi.string().required(),
-  collection_date: Joi.date().required(),
+  collection_day: Joi.string().required().valid(...DAYS_OF_THE_WEEK),
+  start_date: Joi.date().optional(),
+  end_date: Joi.date().optional(),
 });
 
 export const contractSchema = Joi.object({

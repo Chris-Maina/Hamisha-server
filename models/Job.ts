@@ -6,9 +6,12 @@ class Job extends Model {
   id!: number
   location!: string
   created_at!: Date
+  quantity!: number
   customer_id!: number
-  collection_date!: Date
+  collection_day!: Date
   status!: string
+  start_date!: Date
+  end_date!: Date
 
   static get tableName() {
     return "jobs"

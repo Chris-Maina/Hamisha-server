@@ -47,3 +47,13 @@ export const MPESA_API = {
 }
 
 export const FILE_DEST: string = "./public/images";
+
+export const DAYS_OF_THE_WEEK = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday"
+];
