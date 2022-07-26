@@ -12,30 +12,15 @@ const PROPOSAL_FIELDS = ['id', 'status', 'payment_amount', 'created_at', 'mover_
 
 router.get('/', async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
-    let response = null;
-    if (req.query) {
-      const { job_id } = req.query;
-      response = await Proposal
-        .query()
-        .where('job_id', parseInt(job_id as string, 10))
-        .orderBy('created_at', 'desc')
-        .withGraphFetched({
-          mover: {
-            account: true,
-          },
-          job: true
-        });
-    } else {
-      response = await Proposal
-        .query()
-        .orderBy('created_at', 'desc')
-        .withGraphFetched({
-          mover: {
-            account: true,
-          },
-          job: true
-        });
-    }
+    const response = await Proposal
+      .query()
+      .orderBy('created_at', 'desc')
+      .withGraphFetched({
+        mover: {
+          account: true,
+        },
+        job: true
+      });
 
     res.status(200);
     res.send(response);
