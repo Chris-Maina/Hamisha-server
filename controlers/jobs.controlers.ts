@@ -70,7 +70,12 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         customer: {
           account: true,
         },
-        proposals: true
+        proposals: {
+          mover: {
+            account: true,
+          },
+          contract: true
+        },
       });
     
     if (!response) throw new createHttpError.NotFound("Job does not exist.");
