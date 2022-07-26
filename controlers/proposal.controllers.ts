@@ -10,17 +10,32 @@ import { PROPOSAL_STATUS } from "../common/constants";
 const router = Router();
 const PROPOSAL_FIELDS = ['id', 'status', 'payment_amount', 'created_at', 'mover_id', 'payment_type'];
 
-router.get('/', verifyToken, async (req: RequestWithPayload, res: Response, next: NextFunction) => {
+router.get('/', async (req: RequestWithPayload, res: Response, next: NextFunction) => {
   try {
-    const response = await Proposal
-      .query()
-      .orderBy('created_at', 'desc')
-      .withGraphFetched({
-        mover: {
-          account: true,
-        },
-        job: true
-      });
+    let response = null;
+    if (req.query) {
+      const { job_id } = req.query;
+      response = await Proposal
+        .query()
+        .where('job_id', parseInt(job_id as string, 10))
+        .orderBy('created_at', 'desc')
+        .withGraphFetched({
+          mover: {
+            account: true,
+          },
+          job: true
+        });
+    } else {
+      response = await Proposal
+        .query()
+        .orderBy('created_at', 'desc')
+        .withGraphFetched({
+          mover: {
+            account: true,
+          },
+          job: true
+        });
+    }
 
     res.status(200);
     res.send(response);
@@ -60,8 +75,8 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         },
       });
 
-      res.status(201);
-      res.send(response);
+    res.status(201);
+    res.send(response);
   } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest(error.details[0].message));
     next(error);
