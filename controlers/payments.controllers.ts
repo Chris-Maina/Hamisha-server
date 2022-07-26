@@ -48,25 +48,26 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { invoice_id, contract_id } = req.query;
-
     console.log("b2c success", req.body);
 
     if (req.body.Result.ResultCode !== 0) throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
-    payload['invoice_id'] = parseInt(invoice_id as string, 10);
-    payload['status'] = PAYMENT_STATUS.SENT;
-    const contractId = parseInt(contract_id as string, 10);
-
-    await Payment.query().insert(payload);
-    await Contract
-      .query()
-      .patch({
-        status: CONTRACT_STATUS.ACCEPTED
-      })
-      .findById(contractId);
+    if (req.query.invoice_id && req.query.contract_id) {
+      const { invoice_id, contract_id } = req.query;
+      payload['invoice_id'] = parseInt(invoice_id as string, 10);
+      payload['status'] = PAYMENT_STATUS.SENT;
+      const contractId = parseInt(contract_id as string, 10);
+  
+      await Payment.query().insert(payload);
+      await Contract
+        .query()
+        .patch({
+          status: CONTRACT_STATUS.ACCEPTED
+        })
+        .findById(contractId);
+    }
 
     // respond to safaricom servers with a success message
     res.json({
