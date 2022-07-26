@@ -49,7 +49,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log("b2c success result", req.body.Result);
-    if (req.body.Result.ResultCode !== "0") throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
+    if (req.body.Result.ResultCode !== 0) throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     console.log("b2c success", req.body.Result.ResultParameters);
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
