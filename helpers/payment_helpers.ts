@@ -225,7 +225,7 @@ export const lipaNaMpesaRequest = async (
     "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
     "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
     "CallBackURL": `https://hamisha-api.herokuapp.com/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
-    "AccountReference": "Hamisha", // Identifier of the transaction for CustomerPayBillOnline transaction type
+    "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
     "TransactionDesc": `Payment for invoice with id ${invoiceId}`
   }
   const options = {
