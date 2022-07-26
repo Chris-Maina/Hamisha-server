@@ -111,6 +111,7 @@ const KEYS: { [x: string]: string } = {
   'Amount': 'amount',
   'TransactionAmount': 'amount',
   'PhoneNumber': 'phone_number',
+  'ReceiverPartyPublicName': 'phone_number',
   'TransactionDate': 'payment_date',
   'TransactionCompletedDateTime': 'payment_date'
 };
