@@ -57,8 +57,9 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
+    payload['status'] = PAYMENT_STATUS.SENT;
     const contractId = parseInt(contract_id as string, 10);
-    // payload['phone_number'] = sender;
+
     await Payment.query().insert(payload);
     await Contract
       .query()
