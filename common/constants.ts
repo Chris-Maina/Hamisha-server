@@ -23,9 +23,9 @@ export const CONTRACT_STATUS = {
 };
 
 export const PAYMENT_STATUS = {
-  RECEIVED: "client payment received",
-  REQUESTED: "payment requested",
-  SENT: "customer payment sent",
+  RECEIVED: "customer payment received", // LipaNaMpesa customer payment has been received successfully
+  REQUESTED: "payment requested", // mover completed job and requests for payment
+  SENT: "mover payment sent", // B2C mover payment sent successfully
 };
 
 export const MESSAGE = 'events/MESSAGE';
