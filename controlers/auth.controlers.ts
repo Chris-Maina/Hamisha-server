@@ -188,14 +188,10 @@ router.post('/reset-password', async (req: Request, res: Response, next: NextFun
 
     const hashedPassword = await User.hashPassword(password);
     userQuery.findById(user.id).patch({ password: hashedPassword });
-    const token = await generateToken(user.id);
-    const newRefreshToken = await generateRefreshToken(user.id, res);
 
     res.status(200);
     return res.send({
-      message: "Successfully updated password",
-      access_token: token,
-      refresh_token: newRefreshToken
+      message: "Successfully updated password, login.",
     })
   } catch (error: any) {
     if (error.isJoi) return next(new createHttpError.BadRequest('Provide a valid email/password.'));
