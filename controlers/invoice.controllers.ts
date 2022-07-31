@@ -121,7 +121,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
           invoice.total,
           invoice.id,
           invoice.contract_id,
-          "254708374149" || invoice.creator!.phone_number // Test phone number
+          invoice.creator!.phone_number // Test phone number "254708374149"
         );
     }
 
