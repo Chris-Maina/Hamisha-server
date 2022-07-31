@@ -247,7 +247,6 @@ export const b2cMpesaRequest = async (
 ): Promise<void> => {
   const token = await getMpesaAuthToken();
   const securityCredentials = await getSecurityCredentials();
-  console.log("securityCredentials >>>>>>>", securityCredentials);
   const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
 
   // const amountToSend: number = amount - (COMMISSION * amount);
