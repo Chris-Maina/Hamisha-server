@@ -28,6 +28,7 @@ export function uploadFile(pathLike: PathLike, filename: string): Promise<S3Uplo
 /**
  * Downloads a file from S3
  * @param fileKey - string
+ * @returns Readable
  */
 export function getFileStream(fileKey: string): Readable {
   const downloadParams = {
@@ -36,4 +37,22 @@ export function getFileStream(fileKey: string): Readable {
   };
 
   return S3.getObject(downloadParams).createReadStream();
+}
+
+/**
+ * Downloads a file from S3
+ * @param fileKey - string
+ * @returns Promise
+ */
+export function getFileData(fileKey: string): Promise<S3Client.GetObjectOutput> {
+  const downloadParams = {
+    Key: fileKey,
+    Bucket: process.env.S3_BUCKET_NAME || '',
+  };
+  return new Promise((resolve, reject) => {
+    S3.getObject(downloadParams, (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
+  });
 }
