@@ -48,7 +48,6 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log("B2C response >>>>>>>>", req.body.Result);
     if (req.body.Result.ResultCode !== 0) throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
