@@ -4,7 +4,7 @@ import {
   constants,
   X509Certificate
  } from "crypto";
-import { readFile } from "fs";
+ import { getFileData } from "../s3config";
 import { COMMISSION } from "../common/constants";
 
 export interface MpesaToken {
@@ -173,17 +173,13 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
   ).toString('base64');
 }
 
-export const getSecurityCredentials = (): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    // Read file asynchronously
-    readFile("security/SandboxCertificate.cer", null, (err, data) => {
-      if (err) {
-        reject(err);
-      }
-      const securityCredentials: string = createSecurityCredentialsFromData(data)
-      resolve(securityCredentials)
-    })
-  })
+export const getSecurityCredentials = async (): Promise<string> => {
+  try {
+    const certificate = await getFileData("SandboxCertificate.cer");
+    return certificate && certificate.Body ? createSecurityCredentialsFromData(certificate.Body as Buffer) : "";
+  } catch (error) {
+    throw error;
+  }
 }
 
 export const urlWithParams = (url: string, params: any): string => {
@@ -251,6 +247,7 @@ export const b2cMpesaRequest = async (
 ): Promise<void> => {
   const token = await getMpesaAuthToken();
   const securityCredentials = await getSecurityCredentials();
+  console.log("securityCredentials >>>>>>>", securityCredentials);
   const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
 
   // const amountToSend: number = amount - (COMMISSION * amount);
