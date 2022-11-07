@@ -120,12 +120,6 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         mover: {
           vehicles: true
         },
-        rooms: {
-          messages: true,
-          participants: {
-            user: true
-          },
-        }
       });
     
     if (!user) throw new createHttpError.NotFound(`User is not registered`);
