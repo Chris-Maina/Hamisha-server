@@ -1,10 +1,10 @@
 import { request } from "https";
-import { 
+import {
   publicEncrypt,
   constants,
   X509Certificate
- } from "crypto";
- import { getFileData } from "../s3config";
+} from "crypto";
+import { getFileData } from "../s3config";
 import { COMMISSION } from "../common/constants";
 
 export interface MpesaToken {
@@ -124,7 +124,7 @@ const KEYS: { [x: string]: string } = {
 export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
   return itemArray.reduce((acc, curr) => {
     if (KEYS[curr.Name]) {
-      return { 
+      return {
         ...acc,
         [KEYS[curr.Name]]: formatMpesaValues(KEYS[curr.Name], curr.Value)
       }
@@ -221,7 +221,7 @@ export const lipaNaMpesaRequest = async (
     "PartyA": senderPhoneNumber, // the MSISDN sending the funds
     "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
     "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
-    "CallBackURL": `https://hamisha-api.herokuapp.com/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
+    "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
     "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
     "TransactionDesc": `Payment for invoice with id ${invoiceId}`
   }
@@ -231,7 +231,7 @@ export const lipaNaMpesaRequest = async (
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "https://hamisha-api.herokuapp.com",
+      "Access-Control-Allow-Origin": `${process.env.BASE_URL}`,
       "Authorization": `Bearer ${token?.access_token}`
     }
   }
@@ -259,8 +259,8 @@ export const b2cMpesaRequest = async (
     PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
     PartyB: recipientPhoneNumber,
     Remarks: "Payment",
-    QueueTimeOutURL: "https://hamisha-api.herokuapp.com/api/payments/b2c/timeout",
-    ResultURL: `https://hamisha-api.herokuapp.com/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
+    QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
+    ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
     Occassion: "pay for service"
   };
 
