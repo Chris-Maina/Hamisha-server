@@ -175,7 +175,8 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
 
 export const getSecurityCredentials = async (): Promise<string> => {
   try {
-    const certificate = await getFileData("SandboxCertificate.cer");
+    const fileKey = process.env.NODE_ENV === "development" ? "SandboxCertificate.cer" : "Production.cer";
+    const certificate = await getFileData(fileKey);
     return certificate && certificate.Body ? createSecurityCredentialsFromData(certificate.Body as Buffer) : "";
   } catch (error) {
     throw error;
@@ -216,7 +217,7 @@ export const lipaNaMpesaRequest = async (
     "BusinessShortCode": BUSINESS_SHORT_CODE,
     "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
     "Timestamp": timeStamp,
-    "TransactionType": "CustomerPayBillOnline",
+    "TransactionType": "CustomerBuyGoodsOnline",
     "Amount": amount,
     "PartyA": senderPhoneNumber, // the MSISDN sending the funds
     "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
