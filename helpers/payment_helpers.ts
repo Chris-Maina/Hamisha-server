@@ -254,34 +254,39 @@ export const b2cMpesaRequest = async (
   contractId: number,
   recipientPhoneNumber: string,
 ): Promise<void> => {
-  const token = await getMpesaAuthToken();
-  const securityCredentials = await getSecurityCredentials();
-  // Organization shortcode
-  const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
+  try {
+    const token = await getMpesaAuthToken();
+    const securityCredentials = await getSecurityCredentials();
+    // Organization shortcode
+    const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
 
-  // const amountToSend: number = amount - (COMMISSION * amount);
-  // Payload for MPESA request to pay recipient
-  const parameters = {
-    InitiatorName: process.env.MPESA_INITIATOR_NAME,
-    SecurityCredential: securityCredentials,
-    CommandID: "BusinessPayment",
-    Amount: amount,
-    PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
-    PartyB: recipientPhoneNumber,
-    Remarks: "Payment",
-    QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
-    ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
-    Occassion: "pay for service"
-  };
+    // const amountToSend: number = amount - (COMMISSION * amount);
+    // Payload for MPESA request to pay recipient
+    const parameters = {
+      InitiatorName: process.env.MPESA_INITIATOR_NAME,
+      SecurityCredential: securityCredentials,
+      CommandID: "BusinessPayment",
+      Amount: amount,
+      PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
+      PartyB: recipientPhoneNumber,
+      Remarks: "Payment",
+      QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
+      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
+      Occassion: "pay for service"
+    };
 
-  const options = {
-    hostname: process.env.NODE_ENV === "development" ? "sandbox.safaricom.co.ke" : "api.safaricom.co.ke",
-    path: "/mpesa/b2c/v1/paymentrequest",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token?.access_token}`
+    const options = {
+      hostname: process.env.NODE_ENV === "development" ? "sandbox.safaricom.co.ke" : "api.safaricom.co.ke",
+      path: "/mpesa/b2c/v1/paymentrequest",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token?.access_token}`
+      }
     }
+    await makeApiRequest(options, parameters);
+  } catch (error) {
+    // Delete the invoice created
+    await Invoice.query().deleteById(invoiceId);
   }
-  await makeApiRequest(options, parameters);
 }

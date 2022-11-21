@@ -5,7 +5,7 @@ import {
   NextFunction
 } from "express";
 import createHttpError from "http-errors";
-import { Payment, Contract } from "../models";
+import { Payment, Contract, Invoice } from "../models";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { CONTRACT_STATUS, PAYMENT_STATUS } from "../common/constants";
 import { mapMpesaKeysToSnakeCase } from "../helpers/payment_helpers";
@@ -16,13 +16,18 @@ const router = Router();
 router.post('/lipanampesa', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { invoice_id, contract_id } = req.query;
+    const invoiceId = parseInt(invoice_id as string, 10);
 
     // Check for status of submission. ResultCode of 0 is a success
-    if (req.body.Body.stkCallback.ResultCode !== 0) throw new createHttpError.InternalServerError();
+    if (req.body.Body.stkCallback.ResultCode !== 0) {
+      // Delete the invoice created while making request
+      await Invoice.query().deleteById(invoiceId);
+      throw new createHttpError.InternalServerError();
+    }
 
     // Create a payment record
     const payload: {[x: string]: any} = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
-    payload['invoice_id'] = parseInt(invoice_id as string, 10);
+    payload['invoice_id'] = invoiceId;
     payload['status'] = PAYMENT_STATUS.RECEIVED;
     await Payment.query().insert(payload);
 
@@ -47,13 +52,18 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
+  const { invoice_id, contract_id } = req.query;
+  const invoiceId = parseInt(invoice_id as string, 10);
   try {
-    if (req.body.Result.ResultCode !== 0) throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
+    if (req.body.Result.ResultCode !== 0) {
+      // Delete the invoice created while making request
+      await Invoice.query().deleteById(invoiceId);
+      throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
+    }
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
-    if (req.query.invoice_id && req.query.contract_id) {
-      const { invoice_id, contract_id } = req.query;
-      payload['invoice_id'] = parseInt(invoice_id as string, 10);
+    if (invoice_id && req.query.contract_id) {
+      payload['invoice_id'] = invoiceId;
       payload['status'] = PAYMENT_STATUS.SENT;
       const contractId = parseInt(contract_id as string, 10);
   
