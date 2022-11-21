@@ -242,7 +242,7 @@ export const lipaNaMpesaRequest = async (
 
     return await makeApiRequest(options, payload);
   } catch (error) {
-    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error)
+    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error, process.env.NODE_ENV)
     // Delete the invoice created
     await Invoice.query().deleteById(invoiceId);
   }
