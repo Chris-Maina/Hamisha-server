@@ -222,7 +222,7 @@ export const lipaNaMpesaRequest = async (
       "TransactionType": "CustomerBuyGoodsOnline",
       "Amount": amount,
       "PartyA": senderPhoneNumber, // the MSISDN sending the funds
-      "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
+      "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funds
       "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
       "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
       "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
@@ -230,7 +230,7 @@ export const lipaNaMpesaRequest = async (
     }
     const options = {
       hostname: "sandbox.safaricom.co.ke",
-      path: "/mpesa/stkpush/v1/processrequest",
+      path: "/mpesa/stkpushquery/v1/query",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -241,7 +241,7 @@ export const lipaNaMpesaRequest = async (
 
     return await makeApiRequest(options, payload);
   } catch (error) {
-    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error)
+    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error, )
     // Delete the invoice created
     await Invoice.query().deleteById(invoiceId);
   }
