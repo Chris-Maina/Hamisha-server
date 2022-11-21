@@ -17,6 +17,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
   try {
     const { invoice_id, contract_id } = req.query;
     const invoiceId = parseInt(invoice_id as string, 10);
+    console.log("lipanampesa:Response >>>>>>>>>>>>>", req.body)
 
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Body.stkCallback.ResultCode !== 0) {
