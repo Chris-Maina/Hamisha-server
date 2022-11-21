@@ -230,7 +230,7 @@ export const lipaNaMpesaRequest = async (
     }
     const options = {
       hostname: "sandbox.safaricom.co.ke",
-      path: "/mpesa/stkpushquery/v1/query",
+      path: "/mpesa/stkpush/v1/processrequest",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -241,7 +241,7 @@ export const lipaNaMpesaRequest = async (
 
     return await makeApiRequest(options, payload);
   } catch (error) {
-    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error, )
+    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error)
     // Delete the invoice created
     await Invoice.query().deleteById(invoiceId);
   }
