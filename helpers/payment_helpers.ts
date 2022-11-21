@@ -6,6 +6,7 @@ import {
 } from "crypto";
 import { getFileData } from "../s3config";
 import { COMMISSION } from "../common/constants";
+import { Invoice } from "../models";
 
 export interface MpesaToken {
   access_token: string,
@@ -205,39 +206,45 @@ export const lipaNaMpesaRequest = async (
   contractId: number,
   senderPhoneNumber: string
 ): Promise<void | unknown> => {
-  /**
+  try {
+    /**
      * Check to see if you have mpesa token. You can use Redis here
      * If yes, proceed with lipa na mpesa api request
      * if no, generate a new token
      */
-  const token = await getMpesaAuthToken();
-  const timeStamp = getTimestamp();
-  const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
-  const payload = {
-    "BusinessShortCode": BUSINESS_SHORT_CODE,
-    "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
-    "Timestamp": timeStamp,
-    "TransactionType": "CustomerBuyGoodsOnline",
-    "Amount": amount,
-    "PartyA": senderPhoneNumber, // the MSISDN sending the funds
-    "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
-    "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
-    "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
-    "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
-    "TransactionDesc": `Payment for invoice with id ${invoiceId}`
-  }
-  const options = {
-    hostname: "sandbox.safaricom.co.ke",
-    path: "/mpesa/stkpush/v1/processrequest",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": `${process.env.BASE_URL}`,
-      "Authorization": `Bearer ${token?.access_token}`
+    const token = await getMpesaAuthToken();
+    const timeStamp = getTimestamp();
+    const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
+    const payload = {
+      "BusinessShortCode": BUSINESS_SHORT_CODE,
+      "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
+      "Timestamp": timeStamp,
+      "TransactionType": "CustomerBuyGoodsOnline",
+      "Amount": amount,
+      "PartyA": senderPhoneNumber, // the MSISDN sending the funds
+      "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funcs
+      "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
+      "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
+      "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
+      "TransactionDesc": `Payment for invoice with id ${invoiceId}`
     }
-  }
+    const options = {
+      hostname: "sandbox.safaricom.co.ke",
+      path: "/mpesa/stkpush/v1/processrequest",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": `${process.env.BASE_URL}`,
+        "Authorization": `Bearer ${token?.access_token}`
+      }
+    }
 
-  return await makeApiRequest(options, payload);
+    return await makeApiRequest(options, payload);
+  } catch (error) {
+    console.log("lipaNaMpesaRequest:Error >>>>>>>>>>>>>", error)
+    // Delete the invoice created
+    await Invoice.query().deleteById(invoiceId);
+  }
 }
 
 export const b2cMpesaRequest = async (
