@@ -214,6 +214,7 @@ export const lipaNaMpesaRequest = async (
      */
     const token = await getMpesaAuthToken();
     const timeStamp = getTimestamp();
+    // Paybill number receiving the funds
     const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
     const payload = {
       "BusinessShortCode": BUSINESS_SHORT_CODE,
@@ -222,7 +223,7 @@ export const lipaNaMpesaRequest = async (
       "TransactionType": "CustomerBuyGoodsOnline",
       "Amount": amount,
       "PartyA": senderPhoneNumber, // the MSISDN sending the funds
-      "PartyB": BUSINESS_SHORT_CODE, // the org shortcode receiving the funds
+      "PartyB": BUSINESS_SHORT_CODE,
       "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
       "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
       "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
@@ -255,6 +256,7 @@ export const b2cMpesaRequest = async (
 ): Promise<void> => {
   const token = await getMpesaAuthToken();
   const securityCredentials = await getSecurityCredentials();
+  // Organization shortcode
   const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
 
   // const amountToSend: number = amount - (COMMISSION * amount);
