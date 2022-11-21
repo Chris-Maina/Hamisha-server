@@ -72,7 +72,7 @@ export const getMpesaAuthToken = async (): Promise<any> => {
   const encodedConsumerKeyAndSecret = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
 
   const options = {
-    hostname: "sandbox.safaricom.co.ke",
+    hostname: process.env.NODE_ENV === "development" ? "sandbox.safaricom.co.ke" : "api.safaricom.co.ke",
     path: "/oauth/v1/generate?grant_type=client_credentials",
     method: "GET",
     headers: {
@@ -229,7 +229,7 @@ export const lipaNaMpesaRequest = async (
       "TransactionDesc": `Payment for invoice with id ${invoiceId}`
     }
     const options = {
-      hostname: "sandbox.safaricom.co.ke",
+      hostname: process.env.NODE_ENV === "development" ? "sandbox.safaricom.co.ke" : "api.safaricom.co.ke",
       path: "/mpesa/stkpush/v1/processrequest",
       method: "POST",
       headers: {
@@ -273,7 +273,7 @@ export const b2cMpesaRequest = async (
   };
 
   const options = {
-    hostname: "sandbox.safaricom.co.ke",
+    hostname: process.env.NODE_ENV === "development" ? "sandbox.safaricom.co.ke" : "api.safaricom.co.ke",
     path: "/mpesa/b2c/v1/paymentrequest",
     method: "POST",
     headers: {
