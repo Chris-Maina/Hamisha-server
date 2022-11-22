@@ -223,7 +223,7 @@ export const lipaNaMpesaRequest = async (
       "TransactionType": "CustomerBuyGoodsOnline",
       "Amount": amount,
       "PartyA": senderPhoneNumber, // the MSISDN sending the funds
-      "PartyB": parseInt(process.env.MPESA_STORE_NUMBER!, 10), // Till number
+      "PartyB": parseInt(process.env.MPESA_TILL_NUMBER!, 10), // Till number
       "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
       "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
       "AccountReference": "Bebataka", // Identifier of the transaction for CustomerBuyGoodsOnline transaction type
