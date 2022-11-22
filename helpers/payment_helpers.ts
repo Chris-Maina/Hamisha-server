@@ -255,14 +255,14 @@ export const b2cMpesaRequest = async (
 ): Promise<void> => {
   try {
     const token = await getMpesaAuthToken();
-    // const securityCredentials = await getSecurityCredentials();
+    const securityCredentials = await getSecurityCredentials();
     const BUSINESS_SHORT_CODE = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
 
     // const amountToSend: number = amount - (COMMISSION * amount);
     // Payload for MPESA request to pay recipient
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
-      SecurityCredential: process.env.MPESA_INITIATOR_PWD,
+      SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amount,
       PartyA: BUSINESS_SHORT_CODE,//  Organization shortcode
