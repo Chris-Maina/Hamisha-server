@@ -214,8 +214,8 @@ export const lipaNaMpesaRequest = async (
      */
     const token = await getMpesaAuthToken();
     const timeStamp = getTimestamp();
-    // Paybill number receiving the funds
-    const BUSINESS_SHORT_CODE = parseInt(process.env.BUSINESS_SHORT_CODE!, 10);
+    const BUSINESS_SHORT_CODE = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
+
     const payload = {
       "BusinessShortCode": BUSINESS_SHORT_CODE,
       "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
@@ -223,10 +223,10 @@ export const lipaNaMpesaRequest = async (
       "TransactionType": "CustomerBuyGoodsOnline",
       "Amount": amount,
       "PartyA": senderPhoneNumber, // the MSISDN sending the funds
-      "PartyB": BUSINESS_SHORT_CODE,
+      "PartyB": parseInt(process.env.MPESA_STORE_NUMBER!, 10), // Till number
       "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
       "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
-      "AccountReference": "Bebataka", // Identifier of the transaction for CustomerPayBillOnline transaction type
+      "AccountReference": "Bebataka", // Identifier of the transaction for CustomerBuyGoodsOnline transaction type
       "TransactionDesc": `Payment for invoice with id ${invoiceId}`
     }
     const options = {
@@ -257,8 +257,7 @@ export const b2cMpesaRequest = async (
   try {
     const token = await getMpesaAuthToken();
     const securityCredentials = await getSecurityCredentials();
-    // Organization shortcode
-    const BUSINESS_SHORT_CODE = parseInt(process.env.B2C_SHORT_CODE!, 10);
+    const BUSINESS_SHORT_CODE = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
 
     // const amountToSend: number = amount - (COMMISSION * amount);
     // Payload for MPESA request to pay recipient
@@ -267,7 +266,7 @@ export const b2cMpesaRequest = async (
       SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amount,
-      PartyA: BUSINESS_SHORT_CODE,//  B2C organization shortcode
+      PartyA: BUSINESS_SHORT_CODE,//  Organization shortcode
       PartyB: recipientPhoneNumber,
       Remarks: "Payment",
       QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
