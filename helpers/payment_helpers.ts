@@ -282,6 +282,7 @@ export const b2cMpesaRequest = async (
         "Authorization": `Bearer ${token?.access_token}`
       }
     }
+    console.log("B2C:Payload >>>>>>>>>>>>>>>>>>", parameters)
     await makeApiRequest(options, parameters);
   } catch (error) {
     console.log("b2cMpesaRequest:Error >>>>>>>>>>>>>", error)
