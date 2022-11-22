@@ -176,7 +176,7 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
 
 export const getSecurityCredentials = async (): Promise<string> => {
   try {
-    const fileKey = process.env.NODE_ENV === "development" ? "SandboxCertificate.cer" : "Production.cer";
+    const fileKey = process.env.NODE_ENV === "development" ? "SandboxCertificate.cer" : "ProductionCertificate.cer";
     const certificate = await getFileData(fileKey);
     return certificate && certificate.Body ? createSecurityCredentialsFromData(certificate.Body as Buffer) : "";
   } catch (error) {
