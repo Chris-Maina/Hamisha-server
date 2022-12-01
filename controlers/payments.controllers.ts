@@ -72,7 +72,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
       await Contract
         .query()
         .patch({
-          status: CONTRACT_STATUS.ACCEPTED
+          status: CONTRACT_STATUS.CLOSED
         })
         .findById(contractId);
     }
