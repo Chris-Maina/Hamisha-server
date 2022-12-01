@@ -214,11 +214,12 @@ export const lipaNaMpesaRequest = async (
      */
     const token = await getMpesaAuthToken();
     const timeStamp = getTimestamp();
-    const BUSINESS_SHORT_CODE = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
+    // Head office/store number
+    const HEAD_OFFICE_NUMBER = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
 
     const payload = {
-      "BusinessShortCode": BUSINESS_SHORT_CODE,
-      "Password": Buffer.from(`${BUSINESS_SHORT_CODE}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
+      "BusinessShortCode": HEAD_OFFICE_NUMBER,
+      "Password": Buffer.from(`${HEAD_OFFICE_NUMBER}${process.env.PASS_KEY}${timeStamp}`).toString('base64'),
       "Timestamp": timeStamp,
       "TransactionType": "CustomerBuyGoodsOnline",
       "Amount": amount,
@@ -256,7 +257,7 @@ export const b2cMpesaRequest = async (
   try {
     const token = await getMpesaAuthToken();
     const securityCredentials = await getSecurityCredentials();
-    const BUSINESS_SHORT_CODE = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
+    const B2C_SHORT_CODE = parseInt(process.env.MPESA_B2C_SHORT_CODE!, 10);
 
     // const amountToSend: number = amount - (COMMISSION * amount);
     // Payload for MPESA request to pay recipient
@@ -265,7 +266,7 @@ export const b2cMpesaRequest = async (
       SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amount,
-      PartyA: BUSINESS_SHORT_CODE,//  Organization shortcode
+      PartyA: B2C_SHORT_CODE,//  Organization shortcode
       PartyB: recipientPhoneNumber,
       Remarks: "Payment",
       QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
