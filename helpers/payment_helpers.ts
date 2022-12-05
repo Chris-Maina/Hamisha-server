@@ -2,7 +2,7 @@ import { request } from "https";
 import {
   publicEncrypt,
   constants,
-  X509Certificate
+  createPublicKey
 } from "crypto";
 import { getFileData } from "../s3config";
 import { COMMISSION } from "../common/constants";
@@ -161,13 +161,15 @@ const getByteArray = (stringToConvert: string): Uint8Array => {
  * @returns string - security credentials
  */
 const createSecurityCredentialsFromData = (fileData: Buffer): string => {
-  // Convert to X509Certificate
-  const x509 = new X509Certificate(fileData);
+  console.log("File data >>>>>>>>>>>>", fileData);
+  // Get public key
+  const publicKey = createPublicKey(fileData).export({ type: 'pkcs1', format: 'pem' });
   // Convert pwd to byte array
   const byteArray = getByteArray(process.env.MPESA_INITIATOR_PWD!);
+  
   return publicEncrypt(
     {
-      key: x509.publicKey,
+      key: publicKey,
       padding: constants.RSA_PKCS1_PADDING,
     },
     byteArray
@@ -176,6 +178,7 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
 
 export const getSecurityCredentials = async (): Promise<string> => {
   try {
+    console.log("process.env.NODE_ENV >>>>>>>>>>>>>", process.env.NODE_ENV)
     const fileKey = process.env.NODE_ENV === "development" ? "SandboxCertificate.cer" : "ProductionCertificate.cer";
     const certificate = await getFileData(fileKey);
     return certificate && certificate.Body ? createSecurityCredentialsFromData(certificate.Body as Buffer) : "";
