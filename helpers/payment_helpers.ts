@@ -263,7 +263,7 @@ export const b2cMpesaRequest = async (
     // Payload for MPESA request to pay recipient
     const parameters = {
       InitiatorName: process.env.MPESA_INITIATOR_NAME,
-      SecurityCredential: securityCredentials,
+      SecurityCredential: 'AuVj/Pbv3YVzf+R/IphWHq97W23PwmEtJiXocEScDURJfMHeW0aabJanzAPlhqQIkysy7yUgZ/jIhI2JLQd1XY1OqTPDrZ7APz9+KcPnnvb+h0ByYczg6JAQODXHow5xEONuGYXG/uuDdny0c/C21LOnmfDuy4+iYdE/jzWkIjChkJmd9sq/lYcdDkIGMbr3CjMtbsvI2ULX7wre12UX/Cga5tZs2mipsvl+zxHHjWSAKh2VM5oJysSZU0m8aLtV41t3LezaE6PLIeTy6l2Lp+hXS+CPd83/laDeuLgJ3PzZ7J1NyX4q6rDpLKwFKRv0TfUvOTFfMAUp6Piu/ruFlg==',
       CommandID: "BusinessPayment",
       Amount: amount,
       PartyA: B2C_SHORT_CODE,//  Organization shortcode
