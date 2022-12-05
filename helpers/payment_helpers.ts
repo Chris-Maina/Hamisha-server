@@ -161,9 +161,9 @@ const getByteArray = (stringToConvert: string): Uint8Array => {
  * @returns string - security credentials
  */
 const createSecurityCredentialsFromData = (fileData: Buffer): string => {
-  console.log("File data >>>>>>>>>>>>", fileData);
   // Get public key
   const publicKey = createPublicKey(fileData).export({ type: 'pkcs1', format: 'pem' });
+  console.log("publicKey >>>>>>>>>>>>", publicKey);
   // Convert pwd to byte array
   const byteArray = getByteArray(process.env.MPESA_INITIATOR_PWD!);
   
@@ -178,7 +178,6 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
 
 export const getSecurityCredentials = async (): Promise<string> => {
   try {
-    console.log("process.env.NODE_ENV >>>>>>>>>>>>>", process.env.NODE_ENV)
     const fileKey = process.env.NODE_ENV === "development" ? "SandboxCertificate.cer" : "ProductionCertificate.cer";
     const certificate = await getFileData(fileKey);
     return certificate && certificate.Body ? createSecurityCredentialsFromData(certificate.Body as Buffer) : "";
