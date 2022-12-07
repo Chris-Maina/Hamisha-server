@@ -101,6 +101,7 @@ router.patch('/:id', verifyToken, async (req: Request, res: Response, next: Next
     const response = await Payment
       .query()
       .patch(req.body)
+      .where('mpesa_receipt_no', id)
       .returning("*");
 
     res.status(200);
