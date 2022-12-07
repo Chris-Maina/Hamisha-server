@@ -56,7 +56,6 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
     const req = request(options, callback);
 
     req.on('error', function (err) {
-      console.log("Err response", err)
       reject(err)
     });
 
@@ -68,8 +67,8 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
   })
 }
 
-export const getMpesaAuthToken = async (): Promise<any> => {
-  const encodedConsumerKeyAndSecret = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
+export const getMpesaAuthToken = async (consumerKey?: string, consumerSecret?: string): Promise<any> => {
+  const encodedConsumerKeyAndSecret = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
   const options = {
     hostname: process.env.NODE_ENV === "development" ? "sandbox.safaricom.co.ke" : "api.safaricom.co.ke",
@@ -163,7 +162,6 @@ const getByteArray = (stringToConvert: string): Uint8Array => {
 const createSecurityCredentialsFromData = (fileData: Buffer): string => {
   // Get public key
   const publicKey = createPublicKey(fileData).export({ type: 'pkcs1', format: 'pem' });
-  console.log("publicKey >>>>>>>>>>>>", publicKey);
   // Convert pwd to byte array
   const byteArray = getByteArray(process.env.MPESA_INITIATOR_PWD!);
   
@@ -214,7 +212,7 @@ export const lipaNaMpesaRequest = async (
      * If yes, proceed with lipa na mpesa api request
      * if no, generate a new token
      */
-    const token = await getMpesaAuthToken();
+    const token = await getMpesaAuthToken(process.env.CONSUMER_KEY, process.env.CONSUMER_SECRET);
     const timeStamp = getTimestamp();
     // Head office/store number
     const HEAD_OFFICE_NUMBER = parseInt(process.env.MPESA_ORG_SHORT_CODE!, 10);
@@ -257,7 +255,7 @@ export const b2cMpesaRequest = async (
   recipientPhoneNumber: string,
 ): Promise<void> => {
   try {
-    const token = await getMpesaAuthToken();
+    const token = await getMpesaAuthToken(process.env.CONSUMER_KEY_B2C, process.env.CONSUMER_SECRET_B2C);
     const securityCredentials = await getSecurityCredentials();
     const B2C_SHORT_CODE = parseInt(process.env.MPESA_B2C_SHORT_CODE!, 10);
 
