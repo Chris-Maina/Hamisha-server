@@ -211,7 +211,9 @@ router.get('/:id', verifyToken, async (req: Request, res: Response, next: NextFu
         },
         proposal: true,
         invoices: {
-          payment: true
+          payment: true,
+          recipient: true,
+          creator: true
         }
       });
 

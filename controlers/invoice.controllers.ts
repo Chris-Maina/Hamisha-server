@@ -5,7 +5,6 @@ import { invoiceSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { RequestWithPayload } from "../common/interfaces";
 import { USER_TYPES } from "../common/constants";
-import { b2cMpesaRequest, lipaNaMpesaRequest } from "../helpers/payment_helpers";
 
 const router = Router();
 
@@ -83,12 +82,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         .withGraphFetched({
           recipient: true,
         });
-      await lipaNaMpesaRequest(
-        invoice.total, 
-        invoice.id,
-        invoice.contract_id,
-        invoice.recipient!.phone_number
-      );
     }
     if (result.issued_by) {
 
@@ -115,13 +108,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         .withGraphFetched({
           creator: true,
         });
-
-        await b2cMpesaRequest(
-          invoice.total,
-          invoice.id,
-          invoice.contract_id,
-          invoice.creator!.phone_number
-        );
     }
 
     res.status(201);

@@ -164,7 +164,6 @@ const createSecurityCredentialsFromData = (fileData: Buffer): string => {
   const publicKey = createPublicKey(fileData).export({ type: 'pkcs1', format: 'pem' });
   // Convert pwd to byte array
   const byteArray = getByteArray(process.env.MPESA_INITIATOR_PWD!);
-  
   return publicEncrypt(
     {
       key: publicKey,
@@ -203,7 +202,6 @@ export const urlWithParams = (url: string, params: any): string => {
 export const lipaNaMpesaRequest = async (
   amount: number,
   invoiceId: number,
-  contractId: number,
   senderPhoneNumber: string
 ): Promise<void | unknown> => {
   try {
@@ -226,7 +224,7 @@ export const lipaNaMpesaRequest = async (
       "PartyA": senderPhoneNumber, // the MSISDN sending the funds
       "PartyB": parseInt(process.env.MPESA_TILL_NUMBER!, 10), // Till number
       "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
-      "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
+      "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}`,
       "AccountReference": "Bebataka", // Identifier of the transaction for CustomerBuyGoodsOnline transaction type
       "TransactionDesc": `Payment for invoice with id ${invoiceId}`
     }
@@ -251,7 +249,6 @@ export const lipaNaMpesaRequest = async (
 export const b2cMpesaRequest = async (
   amount: number,
   invoiceId: number,
-  contractId: number,
   recipientPhoneNumber: string,
 ): Promise<void> => {
   try {
@@ -262,7 +259,7 @@ export const b2cMpesaRequest = async (
     // const amountToSend: number = amount - (COMMISSION * amount);
     // Payload for MPESA request to pay recipient
     const parameters = {
-      InitiatorName: process.env.MPESA_INITIATOR_NAME,
+      InitiatorName: process.env.MPESA_B2C_INITIATOR_NAME,
       SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amount,
@@ -270,7 +267,7 @@ export const b2cMpesaRequest = async (
       PartyB: recipientPhoneNumber,
       Remarks: "Payment",
       QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
-      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
+      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}`,
       Occassion: "pay for service"
     };
 

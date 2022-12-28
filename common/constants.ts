@@ -15,6 +15,11 @@ export const PROPOSAL_STATUS = {
   JOB_UNSUCCESS: 'job finished(unsuccessfully)'
 };
 
+export const PAYMENT_OPTIONS = {
+  1: "LIPA NA MPESA",
+  2: "B2C"
+}
+
 export const CONTRACT_STATUS = {
   DRAFT: 'draft',
   DECLINED: 'rejected', // job was rejected by mover
