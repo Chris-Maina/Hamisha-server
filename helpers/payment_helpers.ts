@@ -259,7 +259,7 @@ export const b2cMpesaRequest = async (
     // const amountToSend: number = amount - (COMMISSION * amount);
     // Payload for MPESA request to pay recipient
     const parameters = {
-      InitiatorName: process.env.MPESA_B2C_INITIATOR_NAME,
+      InitiatorName: process.env.MPESA_INITIATOR_NAME,
       SecurityCredential: securityCredentials,
       CommandID: "BusinessPayment",
       Amount: amount,
