@@ -47,7 +47,7 @@ class Contract extends Model {
       invoices: {
         relation: Model.HasManyRelation,
         modelClass: Invoice,
-        filter: (query: any) => query.select('id'),
+        filter: (query: any) => query.select('id', 'total', 'created_at'),
         join: {
           from: "contracts.id",
           to: "invoices.contract_id"
