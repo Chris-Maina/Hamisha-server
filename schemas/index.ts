@@ -58,9 +58,9 @@ export const invoiceSchema = Joi.object({
 });
 
 export const paymentSchema = Joi.object({
-  customer_id: Joi.number().required(),
-  mover_id: Joi.number().required(),
+  invoice_id: Joi.number().required(),
   contract_id: Joi.number().required(),
-  due_date: Joi.date().optional(),
+  phone_number: Joi.string().required(),
   total: Joi.number().required(),
+  option: Joi.string().required().valid("LIPA NA MPESA", "B2C")
 });
