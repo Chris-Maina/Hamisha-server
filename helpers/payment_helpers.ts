@@ -6,7 +6,6 @@ import {
 } from "crypto";
 import { getFileData } from "../s3config";
 import { COMMISSION } from "../common/constants";
-import { Invoice } from "../models";
 
 export interface MpesaToken {
   access_token: string,
@@ -28,7 +27,7 @@ interface optionsDef {
  * @param {any} postPayload - payload to post
  * @returns Promise
  */
-export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
+export const makeApiRequest = (options: optionsDef, postPayload?: any): Promise<any | Error> => {
 
   return new Promise((resolve, reject) => {
     const callback = (response: any) => {
@@ -48,7 +47,7 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
           output = output && JSON.parse(output);
           resolve(output);
         } catch (error) {
-          reject(error);
+          reject(error as Error);
         }
       });
     }
@@ -64,10 +63,10 @@ export const makeApiRequest = (options: optionsDef, postPayload?: any) => {
     }
 
     req.end();
-  })
+  });
 }
 
-export const getMpesaAuthToken = async (consumerKey?: string, consumerSecret?: string): Promise<any> => {
+export const getMpesaAuthToken = (consumerKey?: string, consumerSecret?: string): Promise<any | Error> => {
   const encodedConsumerKeyAndSecret = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
   const options = {
@@ -203,7 +202,7 @@ export const lipaNaMpesaRequest = async (
   amount: number,
   invoiceId: number,
   senderPhoneNumber: string
-): Promise<void | unknown> => {
+): Promise<any | Error> => {
   try {
     /**
      * Check to see if you have mpesa token. You can use Redis here
@@ -239,10 +238,9 @@ export const lipaNaMpesaRequest = async (
       }
     }
 
-    return await makeApiRequest(options, payload);
+    return makeApiRequest(options, payload);
   } catch (error) {
-    // Delete the invoice created
-    await Invoice.query().deleteById(invoiceId);
+    throw error;
   }
 }
 
@@ -250,7 +248,7 @@ export const b2cMpesaRequest = async (
   amount: number,
   invoiceId: number,
   recipientPhoneNumber: string,
-): Promise<void> => {
+): Promise<void | Error> => {
   try {
     const token = await getMpesaAuthToken(process.env.CONSUMER_KEY_B2C, process.env.CONSUMER_SECRET_B2C);
     const securityCredentials = await getSecurityCredentials();
@@ -267,7 +265,7 @@ export const b2cMpesaRequest = async (
       PartyB: recipientPhoneNumber,
       Remarks: "Payment",
       QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
-      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}`,
+      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}`,// return to Pass contractId as a query param
       Occassion: "pay for service"
     };
 
@@ -281,10 +279,9 @@ export const b2cMpesaRequest = async (
       }
     }
     console.log("B2C:Payload >>>>>>>>>>>>>>>>>>", parameters)
-    await makeApiRequest(options, parameters);
+    return makeApiRequest(options, parameters);
   } catch (error) {
     console.log("b2cMpesaRequest:Error >>>>>>>>>>>>>", error)
-    // Delete the invoice created
-    await Invoice.query().deleteById(invoiceId);
+    throw error;
   }
 }
