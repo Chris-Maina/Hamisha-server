@@ -201,7 +201,8 @@ export const urlWithParams = (url: string, params: any): string => {
 export const lipaNaMpesaRequest = async (
   amount: number,
   invoiceId: number,
-  senderPhoneNumber: string
+  senderPhoneNumber: string,
+  contractId: number,
 ): Promise<any | Error> => {
   try {
     /**
@@ -223,7 +224,7 @@ export const lipaNaMpesaRequest = async (
       "PartyA": senderPhoneNumber, // the MSISDN sending the funds
       "PartyB": parseInt(process.env.MPESA_TILL_NUMBER!, 10), // Till number
       "PhoneNumber": senderPhoneNumber, // the MSISDN sending the funds
-      "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}`,
+      "CallBackURL": `${process.env.BASE_URL}/api/payments/lipanampesa?invoice_id=${invoiceId}&contract_id=${contractId}`,
       "AccountReference": "Bebataka", // Identifier of the transaction for CustomerBuyGoodsOnline transaction type
       "TransactionDesc": `Payment for invoice with id ${invoiceId}`
     }
@@ -248,6 +249,7 @@ export const b2cMpesaRequest = async (
   amount: number,
   invoiceId: number,
   recipientPhoneNumber: string,
+  contractId: number,
 ): Promise<void | Error> => {
   try {
     const token = await getMpesaAuthToken(process.env.CONSUMER_KEY_B2C, process.env.CONSUMER_SECRET_B2C);
@@ -265,7 +267,7 @@ export const b2cMpesaRequest = async (
       PartyB: recipientPhoneNumber,
       Remarks: "Payment",
       QueueTimeOutURL: `${process.env.BASE_URL}/api/payments/b2c/timeout`,
-      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}`,// return to Pass contractId as a query param
+      ResultURL: `${process.env.BASE_URL}/api/payments/b2c?invoice_id=${invoiceId}&contract_id=${contractId}`,
       Occassion: "pay for service"
     };
 

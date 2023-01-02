@@ -23,10 +23,16 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
-    const { invoice_id } = req.query;
+    const { invoice_id, contract_id } = req.query;
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
     payload['status'] = PAYMENT_STATUS.RECEIVED;
     await Payment.query().insert(payload);
+    await Contract
+      .query()
+      .findById(parseInt(contract_id as string, 10))
+      .patch({
+        status: CONTRACT_STATUS.ACCEPTED
+      }); 
 
     // respond to safaricom servers with a success message
     res.json({
@@ -48,11 +54,17 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     }
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
-    const { invoice_id } = req.query;
+    const { invoice_id, contract_id } = req.query;
     if (invoice_id) {
       payload['invoice_id'] = parseInt(invoice_id as string, 10);
       payload['status'] = PAYMENT_STATUS.SENT;
       await Payment.query().insert(payload);
+      await Contract
+        .query()
+        .findById(parseInt(contract_id as string, 10))
+        .patch({
+          status: CONTRACT_STATUS.CLOSED
+        }); 
     }
 
     // respond to safaricom servers with a success message
@@ -95,16 +107,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const result = await paymentSchema.validateAsync(req.body);
     const { total, invoice_id, contract_id, phone_number, option } = result;
     if (option === PAYMENT_OPTIONS[1]) {
-      lipaNaMpesaRequest(total, invoice_id, phone_number)
-      .then(async () => {
-        // Modify contract status to Accepted
-        return await Contract
-          .query()
-          .findById(contract_id)
-          .patch({
-            status: CONTRACT_STATUS.ACCEPTED
-          });  
-      })
+      lipaNaMpesaRequest(total, invoice_id, phone_number, contract_id)
       .then(() => {
         res.status(201);
         res.send({
@@ -115,16 +118,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         next(error);
       });
     } else {
-      b2cMpesaRequest(total, invoice_id, phone_number)
-      .then(async () => {
-        // Modify Contract to mark it as CLOSED
-        return await Contract
-          .query()
-          .findById(contract_id)
-          .patch({
-            status: CONTRACT_STATUS.CLOSED
-          }); 
-      })
+      b2cMpesaRequest(total, invoice_id, phone_number, contract_id)
       .then(() => {
         res.status(201);
         res.send({
