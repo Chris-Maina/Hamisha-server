@@ -41,6 +41,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   console.log("b2c:Response >>>>>>>>>>>>>", req.body);
+  console.log("b2c:Response ReferenceData: >>>>>>>>>>>>>", req.body.Result.ReferenceData);
   try {
     if (req.body.Result.ResultCode !== 0) {
       throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
@@ -95,19 +96,17 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const { total, invoice_id, contract_id, phone_number, option } = result;
     if (option === PAYMENT_OPTIONS[1]) {
       lipaNaMpesaRequest(total, invoice_id, phone_number)
-      .then((_value) => {
+      .then(async () => {
         // Modify contract status to Accepted
-        return Contract
+        return await Contract
           .query()
           .findById(contract_id)
           .patch({
             status: CONTRACT_STATUS.ACCEPTED
-          });
-
-          
+          });  
       })
       .then(() => {
-        res.send(201);
+        res.status(201);
         res.send({
           message: "Successfully sent payment and contract updated.",
         });
@@ -116,10 +115,10 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         next(error);
       });
     } else {
-      // add a .then and make an update to Contract to mark it as CLOSED
       b2cMpesaRequest(total, invoice_id, phone_number)
-      .then(() => {
-        return Contract
+      .then(async () => {
+        // Modify Contract to mark it as CLOSED
+        return await Contract
           .query()
           .findById(contract_id)
           .patch({
@@ -127,7 +126,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
           }); 
       })
       .then(() => {
-        res.send(201);
+        res.status(201);
         res.send({
           message: "Successfully sent payment and contract updated.",
         });
