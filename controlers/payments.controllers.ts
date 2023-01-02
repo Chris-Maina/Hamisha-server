@@ -26,13 +26,16 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     const { invoice_id, contract_id } = req.query;
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
     payload['status'] = PAYMENT_STATUS.RECEIVED;
-    await Payment.query().insert(payload);
-    await Contract
-      .query()
-      .findById(parseInt(contract_id as string, 10))
-      .patch({
-        status: CONTRACT_STATUS.ACCEPTED
-      }); 
+
+    await Promise.all([
+      Payment.query().insert(payload),
+      Contract
+        .query()
+        .findById(parseInt(contract_id as string, 10))
+        .patch({
+          status: CONTRACT_STATUS.ACCEPTED
+        })
+    ]);
 
     // respond to safaricom servers with a success message
     res.json({
@@ -58,13 +61,16 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     if (invoice_id) {
       payload['invoice_id'] = parseInt(invoice_id as string, 10);
       payload['status'] = PAYMENT_STATUS.SENT;
-      await Payment.query().insert(payload);
-      await Contract
-        .query()
-        .findById(parseInt(contract_id as string, 10))
-        .patch({
-          status: CONTRACT_STATUS.CLOSED
-        }); 
+
+      await Promise.all([
+        Payment.query().insert(payload),
+        Contract
+          .query()
+          .findById(parseInt(contract_id as string, 10))
+          .patch({
+            status: CONTRACT_STATUS.CLOSED
+          })
+      ]);
     }
 
     // respond to safaricom servers with a success message
