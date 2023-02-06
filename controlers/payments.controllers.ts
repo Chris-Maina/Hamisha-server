@@ -113,30 +113,14 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     const result = await paymentSchema.validateAsync(req.body);
     const { total, invoice_id, contract_id, phone_number, option } = result;
     if (option === PAYMENT_OPTIONS[1]) {
-      lipaNaMpesaRequest(total, invoice_id, phone_number, contract_id)
-      .then((result) => {
-        console.log("LIPA NA MPESA result >>>>>>>>>>", result);
-        res.status(201);
-        res.send({
-          message: "Successfully sent payment and contract updated.",
-        });
-      })
-      .catch((error) => {
-        next(error);
-      });
+      await lipaNaMpesaRequest(total, invoice_id, phone_number, contract_id);
     } else {
-      b2cMpesaRequest(total, invoice_id, phone_number, contract_id)
-      .then((result) => {
-        console.log("B2C result >>>>>>>>>>>>>>", result);
-        res.status(201);
-        res.send({
-          message: "Successfully sent payment and contract updated.",
-        });
-      })
-      .catch((error) => {
-        next(error);
-      });
+      await b2cMpesaRequest(total, invoice_id, phone_number, contract_id);
     }
+    res.status(201);
+    res.send({
+      message: "Successfully sent payment and contract updated.",
+    });
   } catch (error) {
     next(error);
   }
