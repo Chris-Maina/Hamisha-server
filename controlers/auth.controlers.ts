@@ -109,7 +109,7 @@ router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Res
 
 router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await loginSchema.validateAsync(req.body);
+    const result = await loginSchema.validateAsync({ email: req.body.email, password: req.body.password });
     const { email, password } = result;
 
     const user = await User
