@@ -15,7 +15,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'REFRESH SECRET KEY
 export const generateToken = (userId: Number): Promise<string | undefined | HttpError> => {
   const payload = { id: userId };
   const options = {
-    expiresIn: '15m'
+    expiresIn: '1d'
   }
   return new Promise((resolve, reject) => {
     JWT.sign(payload, JWT_SECRET, options, (err, token) => {
@@ -48,6 +48,7 @@ export const verifyToken = (req: RequestWithPayload, _res: Response, next: NextF
   });
 }
 
+// TODO: REMOVE IN FAVOUR OF NEXT AUTH
 /**
  * A promise that resolves to a refresh token or an error
  * @param {number} userId 
