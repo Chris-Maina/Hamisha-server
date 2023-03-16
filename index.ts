@@ -5,12 +5,14 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { Model } from 'objection';
 import { createServer } from "http";
+import schedule from "node-schedule";
 import createError from 'http-errors';
 import express, { Request, Response, NextFunction } from 'express';
 
 import knex from './knex';
 import routes from './controlers';
 import initializeSocketIO from './socket';
+import { sendMailDaemon } from './daemons/mail.daemon';
 
 // Bind all Models to a knex instance.
 Model.knex(knex);
@@ -28,6 +30,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Serve static files such as images
 app.use(express.static(__dirname + '/public'));
+// Schedule sending mails every 26th of the month
+const rule = new schedule.RecurrenceRule();
+rule.date = 26;
+rule.hour = 12;
+rule.minute = 0;
+sendMailDaemon(rule);
 
 /* Endpoints */
 app.use('/api', routes);
@@ -49,4 +57,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 const PORT = process.env.PORT || 3100;
 
-httpServer.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`))
+httpServer.listen(PORT, () => console.log(`Server running on port http://localhost:${PORT}`));
+
+process.on('SIGINT', function () {
+  schedule.gracefulShutdown()
+    .then(() => httpServer.close(() => process.exit(0)))
+});
