@@ -44,4 +44,4 @@ export const sendMailDaemon = (rule: string | RecurrenceRule) => {
       throw error;
     }
   });
-} 
+}
