@@ -30,12 +30,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Serve static files such as images
 app.use(express.static(__dirname + '/public'));
-// Schedule sending mails every 26th of the month
-const rule = new schedule.RecurrenceRule();
-rule.date = 26;
-rule.hour = 12;
-rule.minute = 0;
-sendMailDaemon(rule);
+
+if (process.env.NODE_ENV === 'production') {
+  // Schedule sending mails every 26th of the month
+  const rule = new schedule.RecurrenceRule();
+  rule.date = 26;
+  rule.hour = 12;
+  rule.minute = 0;
+  sendMailDaemon(rule);
+}
 
 /* Endpoints */
 app.use('/api', routes);
