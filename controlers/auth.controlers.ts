@@ -202,7 +202,9 @@ router.get('/profile', verifyToken, async (req: RequestWithPayload, res: Respons
       .findById(id)
       .select('id', 'first_name', 'last_name', 'email', 'phone_number')
       .withGraphFetched({
-        customer: true,
+        customer: {
+          jobs: true
+        },
         mover: {
           vehicles: true
         }

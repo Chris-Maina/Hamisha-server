@@ -65,7 +65,9 @@ router.patch('/users/:id', verifyToken, async (req: Request, res: Response, next
       .where('id', id)
       .returning(['id', 'email', 'first_name', 'last_name', 'phone_number'])
       .withGraphFetched({
-        customer: true,
+        customer: {
+          jobs: true
+        },
         mover: {
           vehicles: true
         }
