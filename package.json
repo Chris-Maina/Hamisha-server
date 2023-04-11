@@ -9,7 +9,7 @@
     "dev": "nodemon --ext ts index.ts",
     "start": "node dist/index.js",
     "build": "tsc",
-    "postinstall": "yarn build",
+    "postinstall": "yarn build; yarn migrate:latest",
     "migrate:up": "knex migrate:up",
     "migrate:down": "knex migrate:down",
     "seed:make": "knex seed:make -x ts",
