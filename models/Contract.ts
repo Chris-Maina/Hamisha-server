@@ -5,11 +5,13 @@ import Mover from "./Mover";
 import Proposal from "./Proposal";
 
 class Contract extends Model {
+  id!: number
   status!: string;
   title!: string;
   proposal_id!: number;
   customer_id!: number;
   mover_id!: number;
+  proposal!: Proposal;
 
   static get tableName() {
     return "contracts";

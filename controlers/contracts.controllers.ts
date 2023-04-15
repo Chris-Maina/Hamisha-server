@@ -2,13 +2,14 @@ import { Router, Request, Response, NextFunction } from "express";
 import createHttpError from "http-errors";
 import {
   Contract,
+  Invoice,
   Job,
   Proposal,
   User
 } from "../models";
 import { contractSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { CONTRACT_STATUS } from "../common/constants";
+import { CONTRACT_STATUS, USER_TYPES } from "../common/constants";
 import { JOB_STATUS, RequestWithPayload } from "../common/interfaces";
 
 const router = Router();
@@ -115,6 +116,31 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       });
 
     updateJobFromContract(response);
+    // Create invoices for both mover and customer
+    const [existingInvoice, adminUser] = await Promise.all([
+      await Invoice.query().findOne({ contract_id: response.id }),
+      await User.query().findOne({ role: USER_TYPES.ADMIN })
+    ]);
+  
+    if (!existingInvoice && adminUser) {
+      // const total: number = response.proposal.payment_amount - (COMMISSION * response.proposal.payment_amount);
+      await Invoice.query().insert([
+        {
+          issued_by: adminUser.id,
+          issued_to: response.customer_id,
+          contract_id: response.id,
+          total: response.proposal.payment_amount,
+          description: `User with id ${response.customer_id} pay ksh ${response.proposal.payment_amount}`
+        },
+        {
+          issued_by: response.mover_id,
+          issued_to: adminUser.id,
+          contract_id: response.id,
+          total: response.proposal.payment_amount,
+          description: `Admin pay user with id ${response.mover_id} ksh ${response.proposal.payment_amount}`
+        }
+      ]);
+    }
   
     res.status(201);
     res.send(response);
