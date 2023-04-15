@@ -18,7 +18,7 @@ class Customer extends Model {
       account: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
-        filter: (query: any) => query.select('id', 'first_name', 'last_name', 'email'),
+        filter: (query: any) => query.select('id', 'first_name', 'last_name', 'email', 'phone_number'),
         join: {
           from: 'customers.user_id',
           to: 'users.id'
