@@ -17,6 +17,7 @@ class Invoice extends Model {
   total!: number
   recipient: User | undefined;
   creator: User | undefined;
+  due_date!: Date;
 
   static get tableName() {
     return "invoices";
