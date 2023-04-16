@@ -12,6 +12,8 @@ class Contract extends Model {
   customer_id!: number;
   mover_id!: number;
   proposal!: Proposal;
+  mover!: Mover;
+  customer!: Customer;
 
   static get tableName() {
     return "contracts";

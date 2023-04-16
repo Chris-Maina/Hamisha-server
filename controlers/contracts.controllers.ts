@@ -111,7 +111,9 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
         mover: {
           account: true
         },
-        customer: true,
+        customer: {
+          account: true
+        },
         proposal: true,
       });
 
@@ -127,17 +129,17 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
       await Invoice.query().insert([
         {
           issued_by: adminUser.id,
-          issued_to: response.customer_id,
+          issued_to: response.customer.account.id,
           contract_id: response.id,
           total: response.proposal.payment_amount,
-          description: `User with id ${response.customer_id} pay ksh ${response.proposal.payment_amount}`
+          description: `User with id ${response.customer.account.id} pay ksh ${response.proposal.payment_amount}`
         },
         {
-          issued_by: response.mover_id,
+          issued_by: response.mover.account.id,
           issued_to: adminUser.id,
           contract_id: response.id,
           total: response.proposal.payment_amount,
-          description: `Admin pay user with id ${response.mover_id} ksh ${response.proposal.payment_amount}`
+          description: `Admin pay user with id ${response.mover.account.id} ksh ${response.proposal.payment_amount}`
         }
       ]);
     }
