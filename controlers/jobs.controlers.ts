@@ -22,6 +22,15 @@ router.post('/', verifyToken, async (req: RequestWithPayload, res: Response, nex
       quantity
     } = result;
 
+    const existingJob = await Job.query().findOne({
+      collection_day,
+      location,
+      start_date,
+      end_date,
+      quantity
+    });
+    if (existingJob) throw new createHttpError.Conflict("A job with the same details already exists.")
+
     const customer = await Customer.query().findOne({ user_id: id });
     if (!customer) throw new createHttpError.NotFound('Register as a landlord to create requests');
 
