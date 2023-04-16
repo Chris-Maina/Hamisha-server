@@ -49,10 +49,11 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
-  console.log("b2c:Response >>>>>>>>>>>>>", req.body);
-  console.log("b2c:Response ReferenceData: >>>>>>>>>>>>>", req.body.Result.ReferenceData);
+  console.log("b2c:Response >>>>>>>>>>>>>", req.body.Result.ResultCode, typeof req.body.Result.ResultCode);
+  console.log("b2c:Response ReferenceData: >>>>>>>>>>>>>", req.body.Result.ResultParameters);
   try {
-    if (req.body.Result.ResultCode !== 0) {
+    // Check for status of submission. ResultCode of 0 is a success
+    if (parseInt(req.body.Result.ResultCode, 10) !== 0) {
       throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     }
     // Create a payment record
@@ -79,6 +80,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
       "ResponseDesc": "success"
     });
   } catch (error) {
+    console.log("b2c:Error >>>>>>>>>>>>>", error);
     next(error);
   }
 });
