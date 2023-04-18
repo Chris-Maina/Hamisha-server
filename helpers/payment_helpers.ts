@@ -97,7 +97,7 @@ export const getTimestamp = (): string => {
 }
 
 interface CallbackMetadataItem {
-  Name: string;
+  Key: string;
   Value: any;
 }
 
@@ -122,10 +122,10 @@ const KEYS: { [x: string]: string } = {
  */
 export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
   return itemArray.reduce((acc, curr) => {
-    if (KEYS[curr.Name]) {
+    if (KEYS[curr.Key]) {
       return {
         ...acc,
-        [KEYS[curr.Name]]: formatMpesaValues(KEYS[curr.Name], curr.Value)
+        [KEYS[curr.Key]]: formatMpesaValues(curr.Key, curr.Value)
       }
     }
     return acc;
@@ -134,15 +134,40 @@ export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
 
 const formatMpesaValues = (key: string, value: any) => {
   switch (key) {
-    case KEYS['TransactionDate']:
-    case KEYS['TransactionCompletedDateTime']:
+    case 'TransactionDate':
       return new Date(value);
-    case KEYS['PhoneNumber']:
+    case 'TransactionCompletedDateTime':
+      const [date, time] = value.split(" ");
+      return formatDateTime(date, time);
+    case 'PhoneNumber':
       return value.toString();
+    case 'ReceiverPartyPublicName':
+      return value.substring(0, 12);
     default:
       return value;
   }
 }
+
+/**
+ * 
+ * @param invalidDateString in the format DDMMYYYY
+ * @param time 
+ * @returns date object
+ */
+const formatDateTime = (invalidDateString: string, time: string) => {
+  const [day, month, year] = invalidDateString.split(".");
+  const [hour, min, sec] = time.split(":")
+
+  return new Date(
+    parseInt(year, 10), 
+    parseInt(month, 10),
+    parseInt(day, 10), 
+    parseInt(hour, 10),
+    parseInt(min, 10),
+    parseInt(sec, 10)
+  );
+}
+
 /**
  * 
  * @param stringToConvert 
