@@ -50,18 +50,19 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
   console.log("b2c:Response >>>>>>>>>>>>>", req.body.Result.ResultCode, typeof req.body.Result.ResultCode);
-  console.log("b2c:Response ReferenceData: >>>>>>>>>>>>>", req.body.Result.ResultParameters);
   try {
     // Check for status of submission. ResultCode of 0 is a success
     if (parseInt(req.body.Result.ResultCode, 10) !== 0) {
       throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     }
+    console.log("b2c:Response ReferenceData: >>>>>>>>>>>>>", req.body.Result.ResultParameters);
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
     const { invoice_id, contract_id } = req.query;
     if (invoice_id) {
       payload['invoice_id'] = parseInt(invoice_id as string, 10);
       payload['status'] = PAYMENT_STATUS.SENT;
+      console.log("Payload >>>>>>>>>>>", payload);
 
       await Promise.all([
         Payment.query().insert(payload),

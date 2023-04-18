@@ -6,6 +6,7 @@ class Payment extends Model {
   invoice_id!: number
   phone_number!: number
   amount!: number
+  status!: string
 
   static get tableName() {
     return "payments"
