@@ -64,7 +64,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
       payload['status'] = PAYMENT_STATUS.SENT;
       console.log("Payload >>>>>>>>>>>", payload);
 
-      await Promise.all([
+      const [_payment, contract] = await Promise.all([
         Payment.query().insert(payload),
         Contract
           .query()
@@ -72,7 +72,12 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
           .patch({
             status: CONTRACT_STATUS.CLOSED
           })
+          .withGraphFetched({
+            proposals: true,
+          })
       ]);
+
+      console.log("Job id >>>>>>>", contract);
     }
 
     // respond to safaricom servers with a success message
