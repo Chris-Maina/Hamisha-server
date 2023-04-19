@@ -43,13 +43,13 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
       "ResponseDesc": "success"
     });
   } catch (error) {
+    // reversal request
     next(error);
   }
 });
 
 // Webhook to listen to B2C response
 router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
-  console.log("b2c:Response >>>>>>>>>>>>>", req.body.Result);
   try {
     // Check for status of submission. ResultCode of 0 is a success
     if (req.body.Result.ResultCode !== 0) {
@@ -62,7 +62,6 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     if (invoice_id) {
       payload['invoice_id'] = parseInt(invoice_id as string, 10);
       payload['status'] = PAYMENT_STATUS.SENT;
-      console.log("Payload >>>>>>>>>>>", payload);
 
       const [_payment, contract] = await Promise.all([
         Payment.query().insert(payload),
@@ -73,7 +72,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
             status: CONTRACT_STATUS.CLOSED
           })
           .withGraphFetched({
-            proposals: true,
+            proposal: true,
           })
       ]);
 
