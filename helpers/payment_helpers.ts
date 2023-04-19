@@ -96,6 +96,10 @@ export const getTimestamp = (): string => {
     pad(date.getSeconds());
 }
 
+interface LipaNaMpesaCallbackMetadataItem {
+  Name: string;
+  Value: any;
+}
 interface CallbackMetadataItem {
   Key: string;
   Value: any;
@@ -126,6 +130,18 @@ export const mapMpesaKeysToSnakeCase = (itemArray: CallbackMetadataItem[]) => {
       return {
         ...acc,
         [KEYS[curr.Key]]: formatMpesaValues(curr.Key, curr.Value)
+      }
+    } 
+    return acc;
+  }, {});
+}
+
+export const mapLipaNaMpesaKeysToSnakeCase = (itemArray: LipaNaMpesaCallbackMetadataItem[]) => {
+  return itemArray.reduce((acc, curr) => {
+    if (KEYS[curr.Name]) {
+      return {
+        ...acc,
+        [KEYS[curr.Name]]: formatMpesaValues(curr.Name, curr.Value)
       }
     }
     return acc;

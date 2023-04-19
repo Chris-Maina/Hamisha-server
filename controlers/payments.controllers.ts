@@ -9,7 +9,7 @@ import { paymentSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { Payment, Contract } from "../models";
 import { CONTRACT_STATUS, PAYMENT_OPTIONS, PAYMENT_STATUS } from "../common/constants";
-import { b2cMpesaRequest, lipaNaMpesaRequest, mapMpesaKeysToSnakeCase } from "../helpers/payment_helpers";
+import { b2cMpesaRequest, lipaNaMpesaRequest, mapMpesaKeysToSnakeCase, mapLipaNaMpesaKeysToSnakeCase } from "../helpers/payment_helpers";
 
 const router = Router();
 
@@ -20,9 +20,9 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     if (req.body.Body.stkCallback.ResultCode !== 0) {
       throw new createHttpError.InternalServerError();
     }
-
+    console.log("LIPA NA MPESA >>>>>>", req.body.Body.stkCallback?.CallbackMetadata.Item)
     // Create a payment record
-    const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
+    const payload: { [x: string]: any } = mapLipaNaMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     const { invoice_id, contract_id } = req.query;
     payload['invoice_id'] = parseInt(invoice_id as string, 10);
     payload['status'] = PAYMENT_STATUS.RECEIVED;
