@@ -6,8 +6,9 @@ import {
 } from "express";
 import createHttpError from "http-errors";
 import { paymentSchema } from "../schemas";
+import { JOB_STATUS } from "../common/interfaces";
+import { Payment, Contract, Job } from "../models";
 import { verifyToken } from "../helpers/jwt_helpers";
-import { Payment, Contract } from "../models";
 import { CONTRACT_STATUS, PAYMENT_OPTIONS, PAYMENT_STATUS } from "../common/constants";
 import { b2cMpesaRequest, lipaNaMpesaRequest, mapMpesaKeysToSnakeCase, mapLipaNaMpesaKeysToSnakeCase } from "../helpers/payment_helpers";
 
@@ -20,7 +21,7 @@ router.post('/lipanampesa', async (req: Request, res: Response, next: NextFuncti
     if (req.body.Body.stkCallback.ResultCode !== 0) {
       throw new createHttpError.InternalServerError();
     }
-    console.log("LIPA NA MPESA >>>>>>", req.body.Body.stkCallback?.CallbackMetadata.Item)
+
     // Create a payment record
     const payload: { [x: string]: any } = mapLipaNaMpesaKeysToSnakeCase(req.body.Body.stkCallback?.CallbackMetadata.Item || []);
     const { invoice_id, contract_id } = req.query;
@@ -55,7 +56,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     if (req.body.Result.ResultCode !== 0) {
       throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     }
-    console.log("b2c:Response ReferenceData: >>>>>>>>>>>>>", req.body.Result.ResultParameters);
+
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
     const { invoice_id, contract_id } = req.query;
@@ -73,13 +74,14 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
           })
           .where("id", parseInt(contract_id as string, 10))
           .returning(['id', 'proposal_id'])
+          .first()
           .withGraphFetched({
             proposal: true,
           })
       ]);
 
       if (contract) {
-        console.log("Job id >>>>>>>", contract);
+        await Job.query().patch({ status: JOB_STATUS.COMPLETED }).where("id", contract.proposal.job_id)
       }
     }
 
@@ -89,7 +91,6 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
       "ResponseDesc": "success"
     });
   } catch (error) {
-    console.log("b2c:Error >>>>>>>>>>>>>", error);
     next(error);
   }
 });
