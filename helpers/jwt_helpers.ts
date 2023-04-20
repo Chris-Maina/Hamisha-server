@@ -15,7 +15,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'REFRESH SECRET KEY
 export const generateToken = (userId: Number): Promise<string | undefined | HttpError> => {
   const payload = { id: userId };
   const options = {
-    expiresIn: '15m'
+    expiresIn: '23h' //TODO: Update to 1d or 23h
   }
   return new Promise((resolve, reject) => {
     JWT.sign(payload, JWT_SECRET, options, (err, token) => {
