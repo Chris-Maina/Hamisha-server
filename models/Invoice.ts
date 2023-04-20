@@ -26,7 +26,7 @@ class Invoice extends Model {
 
   static get relationMappings() {
     return {
-      // represents the seller of service i.e mover
+      // represents the provider of the service i.e. mover
        creator: {
         relation: Model.BelongsToOneRelation,
         modelClass: User,

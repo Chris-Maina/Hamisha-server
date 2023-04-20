@@ -11,6 +11,8 @@ class Contract extends Model {
   proposal_id!: number;
   customer_id!: number;
   mover_id!: number;
+  start_time!: Date;
+  end_time!: Date;
   proposal!: Proposal;
   mover!: Mover;
   customer!: Customer;

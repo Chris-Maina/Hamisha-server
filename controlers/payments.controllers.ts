@@ -59,7 +59,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
     // Create a payment record
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
     const { invoice_id, contract_id } = req.query;
-    if (invoice_id) {
+    if (invoice_id && contract_id) {
       payload['invoice_id'] = parseInt(invoice_id as string, 10);
       payload['status'] = PAYMENT_STATUS.SENT;
 
@@ -69,6 +69,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
           .query()
           .findById(parseInt(contract_id as string, 10))
           .patch({
+            end_time: new Date(),
             status: CONTRACT_STATUS.CLOSED
           })
           .withGraphFetched({
@@ -76,7 +77,9 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
           })
       ]);
 
-      console.log("Job id >>>>>>>", contract);
+      if (contract) {
+        console.log("Job id >>>>>>>", contract);
+      }
     }
 
     // respond to safaricom servers with a success message
