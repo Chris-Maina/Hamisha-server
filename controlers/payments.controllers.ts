@@ -67,11 +67,12 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
         Payment.query().insert(payload),
         Contract
           .query()
-          .findById(parseInt(contract_id as string, 10))
           .patch({
             end_time: new Date(),
             status: CONTRACT_STATUS.CLOSED
           })
+          .where("id", parseInt(contract_id as string, 10))
+          .returning(['id', 'proposal_id'])
           .withGraphFetched({
             proposal: true,
           })
