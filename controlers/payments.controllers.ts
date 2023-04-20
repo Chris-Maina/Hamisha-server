@@ -57,7 +57,7 @@ router.post('/b2c', async (req: Request, res: Response, next: NextFunction) => {
       throw new createHttpError.BadRequest(req.body.Result.ResultDesc);
     }
 
-    // Create a payment record
+    // Create a payment record, update contract and job
     const payload: { [x: string]: any } = mapMpesaKeysToSnakeCase(req.body.Result.ResultParameters.ResultParameter || []);
     const { invoice_id, contract_id } = req.query;
     if (invoice_id && contract_id) {
@@ -124,9 +124,28 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
   try {
     const result = await paymentSchema.validateAsync(req.body);
     const { total, invoice_id, contract_id, phone_number, option } = result;
+
     if (option === PAYMENT_OPTIONS[1]) {
+      const [existingPayment, existingContract] = await Promise.all([
+        Payment.query().findOne({ invoice_id, status: PAYMENT_STATUS.RECEIVED }),
+        Contract.query().findOne({ id: contract_id, status: CONTRACT_STATUS.ACCEPTED })
+      ]);
+
+      if (existingPayment || existingContract) {
+        throw new createHttpError.Conflict("A payment for the invoice already exists");
+      }
+     
       await lipaNaMpesaRequest(total, invoice_id, phone_number, contract_id);
     } else {
+
+      const [existingPayment, existingContract] = await Promise.all([
+        Payment.query().findOne({ invoice_id, status: PAYMENT_STATUS.SENT }),
+        Contract.query().findOne({ id: contract_id, status: CONTRACT_STATUS.CLOSED })
+      ]);
+
+      if (existingPayment || existingContract) {
+        throw new createHttpError.Conflict("The contract has already been completed and payment sent");
+      }
       await b2cMpesaRequest(total, invoice_id, phone_number, contract_id);
     }
     res.status(201);
