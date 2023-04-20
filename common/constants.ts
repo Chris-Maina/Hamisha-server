@@ -44,7 +44,7 @@ export const LOAD_MESSAGES_IN_ROOM = 'events/LOAD_MESSAGES_IN_ROOM';
 export const FETCH_MESSAGES_FROM_ROOM = 'events/FETCH_MESSAGES_FROM_ROOM';
 export const FETCH_USER_ROOMS_RESPONSE = 'events/FETCH_USER_ROOMS_RESPONSE';
 
-export const COMMISSION = 0.1;
+export const COMMISSION = 0.25;
 
 export const MPESA_API = {
   LipaNaMpesa: "LIPA NA M-PESA ONLINE",

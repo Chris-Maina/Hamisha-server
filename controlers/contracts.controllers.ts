@@ -11,6 +11,7 @@ import { contractSchema } from "../schemas";
 import { verifyToken } from "../helpers/jwt_helpers";
 import { CONTRACT_STATUS, USER_TYPES } from "../common/constants";
 import { JOB_STATUS, RequestWithPayload } from "../common/interfaces";
+import { getPaymentAmount } from "../helpers/payment_helpers";
 
 const router = Router();
 const contractFields: string[] = [
@@ -125,7 +126,6 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
     ]);
   
     if (!existingInvoice && adminUser) {
-      // const total: number = response.proposal.payment_amount - (COMMISSION * response.proposal.payment_amount);
       await Invoice.query().insert([
         {
           issued_by: adminUser.id,
@@ -139,7 +139,7 @@ router.post('/', verifyToken, async (req: Request, res: Response, next: NextFunc
           issued_by: response.mover.account.id,
           issued_to: adminUser.id,
           contract_id: response.id,
-          total: response.proposal.payment_amount,
+          total: getPaymentAmount(response.proposal.payment_amount),
           description: `Admin pay user with id ${response.mover.account.id} ksh ${response.proposal.payment_amount}`,
           due_date: new Date(new Date().getTime() + (3 * 24 * 60 * 60 * 1000)),// 3 days after current date
         }

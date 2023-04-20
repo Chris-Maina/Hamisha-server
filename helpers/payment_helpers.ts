@@ -326,3 +326,5 @@ export const b2cMpesaRequest = async (
     throw error;
   }
 }
+
+export const getPaymentAmount = (amount: number) => (amount - (amount * COMMISSION));
