@@ -1,3 +1,111 @@
+const commonStyles = `
+  .container {
+    background-color: #f9fafb;
+    color: #000F08;
+  }
+
+  .header {
+    text-align: center;
+  }
+
+  .logo {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold; 
+    margin-bottom: 32px;
+    display: inline-block;
+    letter-spacing: 0.1px;
+    color: #000F08;
+  }
+
+  .favicon {
+    height:25px;
+    margin-bottom:-5px;
+    margin-right: 3px;
+  }
+
+  .title {
+    font-size: 32px;
+    color: #FFBA08;
+    margin: 0;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 22px;
+    margin: 0 auto;
+    text-align: center;
+    margin-bottom: 89px;
+  }
+
+  .text {
+    font-weight: 600;
+    letter-spacing: 0.1px;
+  }
+
+  .table {
+    margin: 0 auto;
+  }
+
+  section {
+    width: 746px;
+    border-radius: 4px;
+    border: solid 1px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    padding: 25px 30px;
+    margin-bottom: 35px;
+  }
+
+  .button {
+    cursor: pointer;
+    text-decoration: none;
+    height: 50px;
+    width: 196px;
+    background-color: #FFBA08;
+    border-radius: 4px;
+    outline: none !important;
+    color: #000F08;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin-bottom: 28px;
+    display: block;
+    text-align: center;
+    line-height: 50px;
+  }
+
+  .button-wrapper > .button{
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .button-wrapper > a {
+    text-decoration: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    .title {
+      font-size: 28px;
+    }
+
+    .subtitle {
+      font-size: 20px;
+    }
+
+    section {
+      width: 300px;
+      padding: 10px;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 960px) {
+    section {
+      width: 546px;
+    }
+  }
+`;
+
 export const getMailTemplate = ({ title, firstName, text }: { title: string, firstName: string, text: string }) => {
   return `
     <!DOCTYPE html>
@@ -6,101 +114,7 @@ export const getMailTemplate = ({ title, firstName, text }: { title: string, fir
         <meta charset="utf-8">
         <title>Bebataka Email Template</title>
         <style>
-          .container {
-            background-color: #f9fafb;
-            color: #000F08;
-          }
-
-          .header {
-            text-align: center;
-          }
-
-          .logo {
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: bold; 
-            margin-bottom: 32px;
-            display: inline-block;
-            letter-spacing: 0.1px;
-            color: #000F08;
-          }
-
-          .favicon {
-            height:25px;
-            margin-bottom:-5px;
-            margin-right: 3px;
-          }
-
-          .title {
-            font-size: 32px;
-            color: #FFBA08;
-            margin: 0;
-            margin-bottom: 10px;
-            text-align: center;
-          }
-
-          .text {
-            font-weight: 600;
-            letter-spacing: 0.1px;
-          }
-
-          .table {
-            margin: 0 auto;
-          }
-
-          section {
-            width: 746px;
-            border-radius: 4px;
-            border: solid 1px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff;
-            padding: 25px 30px;
-            margin-bottom: 35px;
-          }
-
-          .button {
-            cursor: pointer;
-            text-decoration: none;
-            height: 50px;
-            width: 196px;
-            background-color: #FFBA08;
-            border-radius: 4px;
-            outline: none !important;
-            color: #000F08;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            margin-bottom: 28px;
-            display: block;
-            text-align: center;
-            line-height: 50px;
-          }
-
-          .button-wrapper > .button{
-            margin-left: auto;
-            margin-right: auto;
-          }
-
-          .button-wrapper > a {
-            text-decoration: none;
-          }
-
-          @media screen and (max-width: 600px) {
-            .title {
-              font-size: 28px;
-            }
-
-            section {
-              width: 300px;
-              padding: 10px;
-            }
-          }
-
-          @media (min-width: 600px) and (max-width: 960px) {
-            section {
-              width: 546px;
-            }
-          }
-
+          ${commonStyles}
         </style>
       </head>
       <body>
@@ -152,71 +166,10 @@ export const getCustomerIntroMailTemplate = ({ firstName }: { firstName: string 
           <meta charset="utf-8">
           <title>Bebataka Email Template</title>
           <style>
-            .container {
-              background-color: #f9fafb;
-              color: #000F08;
-            }
-
-            .header {
-              text-align: center;
-            }
-
-            .logo {
-              text-decoration: none;
-              font-size: 16px;
-              font-weight: bold; 
-              margin-bottom: 32px;
-              display: inline-block;
-              letter-spacing: 0.1px;
-              color: #000F08;
-            }
-
-            .favicon {
-              height:25px;
-              margin-bottom:-5px;
-              margin-right: 3px;
-            }
-
-            .emoji {
-              font-size: 22px;
-            }
-
-            .title {
-              font-size: 32px;
-              color: #FFBA08;
-              margin: 0;
-              margin-bottom: 10px;
-              text-align: center;
-            }
-            .subtitle {
-              font-size: 22px;
-              margin: 0 auto;
-              text-align: center;
-              margin-bottom: 89px;
-            }
-            .text {
-              font-weight: 600;
-              letter-spacing: 0.1px;
-            }
-
-            .table {
-              margin: 0 auto;
-            }
-
-            section {
-              width: 746px;
-              border-radius: 4px;
-              border: solid 1px rgba(0, 0, 0, 0.1);
-              background-color: #ffffff;
-              padding: 25px 30px;
-              margin-bottom: 35px;
-            }
+            ${commonStyles}
 
             .text-button {
-              color: #FFBA08;
-            }
-
-            .text-button {
+              line-height: 15px;
               height: 15px;
               width: 100px;
               background-color: #FFBA08;
@@ -230,52 +183,6 @@ export const getCustomerIntroMailTemplate = ({ firstName }: { firstName: string 
               vertical-align: middle;
               padding: 4px 0;
               margin: 0 auto;
-            }
-
-            .button {
-              cursor: pointer;
-              text-decoration: none;
-              height: 50px;
-              width: 196px;
-              line-height: 50px;
-              text-align: center;
-              background-color: #FFBA08;
-              border-radius: 4px;
-              outline: none !important;
-              color: #000F08;
-              font-size: 13px;
-              font-weight: bold;
-              letter-spacing: 0.5px;
-              margin-bottom: 28px;
-              display: block;
-            }
-
-            .button-wrapper > .button{
-              margin-left: auto;
-              margin-right: auto;
-            }
-
-            .button-wrapper > a {
-              text-decoration: none;
-            }
-
-            @media screen and (max-width: 600px) {
-              .title {
-                font-size: 28px;
-              }
-              .subtitle {
-                font-size: 20px;
-              }
-              section {
-                width: 300px;
-                padding: 10px;
-              }
-            }
-
-            @media (min-width: 600px) and (max-width: 960px) {
-              section {
-                width: 546px;
-              }
             }
           </style>
         </head>
