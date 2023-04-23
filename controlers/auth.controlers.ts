@@ -14,6 +14,7 @@ import {
 import { upload } from "../multer";
 import { uploadFile } from '../s3config';
 import { unlinkFile } from '../helpers/unlinkFileHelper';
+import { sendCustomerIntroMail } from '../daemons/mail.daemon';
 import { getResizeDestnFileLoc, resizeFormatImageToWebp } from '../helpers/image_helpers';
 
 const router = Router();
@@ -65,7 +66,10 @@ router.post('/register', upload.single('vehicle_pic'), async (req: any, res: Res
       // add to customers table
       await Customer.query().insert({
         user_id: response.id,
-      })
+      });
+
+      // send introduction mail
+      await sendCustomerIntroMail(response.first_name, response.email);
     } else {
       // add to movers table
       const mover = await Mover.query().insert({

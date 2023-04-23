@@ -1,7 +1,7 @@
 import schedule from "node-schedule";
 import type { RecurrenceRule } from "node-schedule";
 import MailingService from "../mailer";
-import { getMailTemplate } from "../helpers/mail_template";
+import { getCustomerIntroMailTemplate, getMailTemplate } from "../helpers/mail_template";
 import { User } from "../models";
 
 /**
@@ -44,4 +44,31 @@ export const sendMailDaemon = (rule: string | RecurrenceRule) => {
       throw error;
     }
   });
+}
+
+export const sendCustomerIntroMail = async (firstName: string, toEmail: string) => {
+  const mailService = new MailingService({
+    user: process.env.MAIL_USER!,
+    pass: process.env.MAIL_PASSWORD!,
+    host: "smtp.gmail.com",
+    port: 587
+  });
+
+  try {
+    const isConnVerified = await mailService.verifyConnection();
+    if (!isConnVerified) {
+      return;
+    }
+
+    await mailService.sendMail({
+      from: `"Bebataka" <${process.env.MAIL_USER}>`,
+      to: toEmail,
+      html: getCustomerIntroMailTemplate({
+        firstName,
+      }),
+      subject: "Welcome"
+    });
+  } catch (error) {
+    throw error;
+  }
 }
