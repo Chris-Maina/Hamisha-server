@@ -25,8 +25,8 @@ export const sendMailDaemon = (rule: string | RecurrenceRule) => {
         return;
       }
 
-      const text = `It that time to think about your trash! Help keep the environment clean by getting a garbage collector to sort you out. We have collectors.<br>
-      Use the link below to schedule, find a collector and clear your garbage!`;
+      const text = `It is that time to think about your trash! Help keep the environment clean by getting a garbage collector to sort you out. We have garbage collectors.<br>
+      Use the link below to request a garbage collector, accept one within your budget and clear your takataka!`;
       const receivers = await User.query().where('role', 'customer').select('id', 'first_name', 'email');
       receivers.forEach(async (receiver) => 
         await mailService.sendMail({

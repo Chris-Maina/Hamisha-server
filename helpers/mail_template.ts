@@ -1,5 +1,4 @@
-
-export const getMailTemplate = ({ title, firstName, text } : { title: string, firstName: string, text: string}) => {
+export const getMailTemplate = ({ title, firstName, text }: { title: string, firstName: string, text: string }) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -8,50 +7,136 @@ export const getMailTemplate = ({ title, firstName, text } : { title: string, fi
         <title>Bebataka Email Template</title>
         <style>
           .container {
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-            background-color: #f4f4f4;
+            background-color: #f9fafb;
+            color: #000F08;
           }
-          .email {
-            width: 80%;
+
+          .header {
+            text-align: center;
+          }
+
+          .logo {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold; 
+            margin-bottom: 32px;
+            display: inline-block;
+            letter-spacing: 0.1px;
+            color: #000F08;
+          }
+
+          .favicon {
+            height:25px;
+            margin-bottom:-5px;
+            margin-right: 3px;
+          }
+
+          .title {
+            font-size: 32px;
+            color: #FFBA08;
+            margin: 0;
+            margin-bottom: 10px;
+            text-align: center;
+          }
+
+          .text {
+            font-weight: 600;
+            letter-spacing: 0.1px;
+          }
+
+          .table {
             margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
           }
-          .email-header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
+
+          section {
+            width: 746px;
+            border-radius: 4px;
+            border: solid 1px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 25px 30px;
+            margin-bottom: 35px;
+          }
+
+          .button {
+            cursor: pointer;
+            text-decoration: none;
+            height: 50px;
+            width: 196px;
+            background-color: #FFBA08;
+            border-radius: 4px;
+            outline: none !important;
+            color: #000F08;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 28px;
+            display: block;
             text-align: center;
+            line-height: 50px;
           }
-          .email-body {
-            padding: 20px;
+
+          .button-wrapper > .button{
+            margin-left: auto;
+            margin-right: auto;
           }
-          .email-footer {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
+
+          .button-wrapper > a {
+            text-decoration: none;
           }
+
+          @media screen and (max-width: 600px) {
+            .title {
+              font-size: 28px;
+            }
+
+            section {
+              width: 300px;
+              padding: 10px;
+            }
+          }
+
+          @media (min-width: 600px) and (max-width: 960px) {
+            section {
+              width: 546px;
+            }
+          }
+
         </style>
       </head>
       <body>
         <div class="container">
-          <div class="email">
-            <div class="email-header">
-              <h1>${title}</h1>
-            </div>
-            <div class="email-body">
-              <p>Hello ${firstName},</p>
-              <p>${text}</p>
-              <p>Take care of your gargbage ☘️,</p>
-              <p>Bebataka</p>
-            </div>
-            <div class="email-footer">
-              <p>Visit <a href="https://www.bebataka.co.ke/">bebatak.co.ke</a> for more.</p>
-            </div>
+          <div class="header">
+            <a href="https://www.bebataka.co.ke/" class="logo">
+              <span>
+                <img class="favicon" src="https://www.bebataka.co.ke//favicon.ico">
+                Bebataka
+              </span>
+            </a>
           </div>
+
+          <h3 class='title text'>${title}</h3>
+
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>
+                  <section>
+                    <p>Hello ${firstName},</p>
+                    <p>${text}</p>
+                    <p>Have fun clearing your gargbage ☘️,</p>
+                    <p>Bebataka</p>
+                  </section>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="button-wrapper">
+                    <a class="button" href="https://www.bebataka.co.ke/">Go to website</a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </body>
     </html>
@@ -59,7 +144,7 @@ export const getMailTemplate = ({ title, firstName, text } : { title: string, fi
 }
 
 
-export const getCustomerIntroMailTemplate = ({ firstName }: { firstName: string}) => {
+export const getCustomerIntroMailTemplate = ({ firstName }: { firstName: string }) => {
   return `
      <!DOCTYPE html>
       <html>
